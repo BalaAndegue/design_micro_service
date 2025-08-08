@@ -47,7 +47,7 @@ export function Header() {
             <div className="bg-gradient-to-r from-blue-600 to-orange-600 p-2 rounded-lg">
               <Palette className="h-6 w-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">CustomCraft</span>
+            <span className="text-xl font-bold text-gray-900">CustomWorld</span>
           </Link>
 
           {/* Navigation Desktop */}

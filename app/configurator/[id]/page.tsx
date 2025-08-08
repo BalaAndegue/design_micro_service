@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,8 @@ import {
   Download,
   Share2,
   Heart,
-  Star
+  Star,
+  Upload
 } from 'lucide-react';
 import { Header } from '@/components/layout/header';
 import { useCart } from '@/providers/cart-provider';
@@ -47,12 +48,12 @@ const colorOptions = [
 ];
 
 const patternOptions = [
-  { name: 'Aucun', value: 'none', price: 0 },
-  { name: 'Rayures', value: 'stripes', price: 3 },
-  { name: 'Points', value: 'dots', price: 3 },
-  { name: 'Géométrique', value: 'geometric', price: 5 },
-  { name: 'Floral', value: 'floral', price: 5 },
-  { name: 'Abstrait', value: 'abstract', price: 7 }
+  { name: 'Aucun', value: 'none', price: 0, image: null },
+  { name: 'Rayures', value: 'stripes', price: 3, image: '/patterns/stripes.png' },
+  { name: 'Points', value: 'dots', price: 3, image: '/patterns/dots.png' },
+  { name: 'Géométrique', value: 'geometric', price: 5, image: '/patterns/geometric.png' },
+  { name: 'Floral', value: 'floral', price: 5, image: '/patterns/floral.png' },
+  { name: 'Abstrait', value: 'abstract', price: 7, image: '/patterns/abstract.png' }
 ];
 
 const sizeOptions = [
@@ -71,20 +72,38 @@ export default function ConfiguratorPage() {
   const [customText, setCustomText] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const calculatePrice = () => {
     let price = mockProduct.basePrice;
     if (selectedColor.premium) price += selectedColor.price || 0;
     price += selectedPattern.price;
     price += selectedSize.price;
-    if (customText.trim()) price += 3; // Prix pour texte personnalisé
+    if (customText.trim()) price += 3;
+    if (uploadedImage) price += 5; // Prix supplémentaire pour image personnalisée
     return price;
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB max
+        toast.error('Fichier trop volumineux (max 5MB)');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setUploadedImage(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleAddToCart = async () => {
     setIsLoading(true);
     
-    // Simulation d'ajout au panier
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     addItem({
@@ -92,12 +111,13 @@ export default function ConfiguratorPage() {
       name: mockProduct.name,
       price: calculatePrice(),
       quantity,
-      image: mockProduct.image,
+      image: uploadedImage || mockProduct.image,
       customizations: {
         color: selectedColor.name,
         pattern: selectedPattern.name,
         text: customText || undefined,
-        size: selectedSize.name
+        size: selectedSize.name,
+        customImage: uploadedImage ? true : undefined
       }
     });
 
@@ -114,6 +134,10 @@ export default function ConfiguratorPage() {
     setSelectedSize(sizeOptions[0]);
     setCustomText('');
     setQuantity(1);
+    setUploadedImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
     toast.info('Configuration réinitialisée');
   };
 
@@ -128,12 +152,39 @@ export default function ConfiguratorPage() {
             <Card className="overflow-hidden">
               <div className="relative aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                 <div 
-                  className="w-64 h-80 rounded-2xl shadow-2xl transition-all duration-500 transform hover:scale-105"
+                  className="w-64 h-80 rounded-2xl shadow-2xl transition-all duration-500 transform hover:scale-105 relative overflow-hidden"
                   style={{ 
                     backgroundColor: selectedColor.value,
-                    backgroundImage: selectedPattern.value !== 'none' ? `url('/patterns/${selectedPattern.value}.png')` : 'none'
                   }}
                 >
+                  {/* Image uploadée ou image par défaut */}
+                  {uploadedImage ? (
+                    <img 
+                      src={uploadedImage} 
+                      alt="Custom upload" 
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img 
+                      src={mockProduct.image} 
+                      alt={mockProduct.name} 
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  )}
+                  
+                  {/* Motif */}
+                  {selectedPattern.value !== 'none' && selectedPattern.image && (
+                    <div 
+                      className="absolute inset-0 w-full h-full opacity-70"
+                      style={{ 
+                        backgroundImage: `url(${selectedPattern.image})`,
+                        backgroundSize: 'cover',
+                        mixBlendMode: 'overlay'
+                      }}
+                    />
+                  )}
+                  
+                  {/* Texte personnalisé */}
                   {customText && (
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span 
@@ -149,6 +200,63 @@ export default function ConfiguratorPage() {
                   )}
                 </div>
               </div>
+            </Card>
+
+            {/* Section d'upload d'image */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Upload className="h-5 w-5 mr-2" />
+                  Image personnalisée
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="custom-image" className="text-base font-medium">
+                      Ajouter votre propre image
+                    </Label>
+                    {uploadedImage && (
+                      <Badge className="bg-blue-600">+€5.00</Badge>
+                    )}
+                  </div>
+                  
+                  <input
+                    id="custom-image"
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    {uploadedImage ? 'Changer l\'image' : 'Téléverser une image'}
+                  </Button>
+                  
+                  {uploadedImage && (
+                    <div className="mt-2 flex justify-end">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setUploadedImage(null);
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = '';
+                          }
+                        }}
+                      >
+                        Supprimer
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
             </Card>
 
             {/* Informations produit */}
@@ -256,7 +364,17 @@ export default function ConfiguratorPage() {
                             onClick={() => setSelectedPattern(pattern)}
                           >
                             <div className="text-center">
-                              <ImageIcon className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                              {pattern.image ? (
+                                <div className="h-20 mb-2 relative">
+                                  <img 
+                                    src={pattern.image} 
+                                    alt={pattern.name}
+                                    className="h-full w-full object-cover rounded"
+                                  />
+                                </div>
+                              ) : (
+                                <ImageIcon className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                              )}
                               <p className="text-sm font-medium">{pattern.name}</p>
                               {pattern.price > 0 && (
                                 <p className="text-xs text-blue-600">+€{pattern.price}</p>
@@ -355,6 +473,13 @@ export default function ConfiguratorPage() {
                     <div className="flex justify-between">
                       <span>Texte personnalisé</span>
                       <span>+€3.00</span>
+                    </div>
+                  )}
+                  
+                  {uploadedImage && (
+                    <div className="flex justify-between">
+                      <span>Image personnalisée</span>
+                      <span>+€5.00</span>
                     </div>
                   )}
                 </div>

@@ -91,6 +91,9 @@ const products = [
 const categories = [
   { value: 'all', label: 'Toutes les catégories' },
   { value: 'coques', label: 'Coques' },
+  {value :'telephones', label: 'Téléphones'},
+  {value: 'tablettes', label: 'Tablettes'},
+  {value:'ordinateurs', label: 'Ordinateurs'},
   { value: 'montres', label: 'Montres' },
   { value: 'vetements', label: 'Vêtements' },
   { value: 'accessoires', label: 'Accessoires' }

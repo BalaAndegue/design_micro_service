@@ -14,7 +14,9 @@ export interface CartItem {
     pattern?: string;
     text?: string;
     size?: string;
+    customImage?: boolean;
   };
+  
 }
 
 interface CartContextType {

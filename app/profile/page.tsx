@@ -25,6 +25,8 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { useAuth } from '@/providers/auth-provider';
 import { toast } from 'sonner';
+import Link from 'next/link';
+
 
 export default function ProfilePage() {
   const { user } = useAuth();

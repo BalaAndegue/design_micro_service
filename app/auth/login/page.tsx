@@ -30,13 +30,36 @@ export default function LoginPage() {
       return;
     }
 
-    const success = await login(formData.email, formData.password);
-    
-    if (success) {
-      toast.success('Connexion réussie !');
-      router.push('/');
-    } else {
-      toast.error('Email ou mot de passe incorrect');
+    try {
+      // Appel à l'API Spring Boot
+      const response = await fetch('http://192.168.1.109:8080/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials:"include",
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Stockage du token JWT et des informations utilisateur
+        localStorage.setItem('token', data.accesToken);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('role', data.user.role);
+        
+        toast.success('Connexion réussie !');
+        router.push('/');
+      } else {
+        toast.error(data.message || 'Email ou mot de passe incorrect');
+      }
+    } catch (error) {
+      console.error('Erreur de connexion:', error);
+      toast.error('Erreur de connexion au serveur');
     }
   };
 
@@ -124,12 +147,6 @@ export default function LoginPage() {
                   </Link>
                 </p>
               </div>
-            </div>
-
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <p className="text-xs text-blue-800">
-                <strong>Démo:</strong> Utilisez n'importe quel email et mot de passe pour vous connecter
-              </p>
             </div>
           </CardContent>
         </Card>

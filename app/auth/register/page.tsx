@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
-import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Phone } from 'lucide-react';
 import { useAuth } from '@/providers/auth-provider';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -21,7 +21,9 @@ export default function RegisterPage() {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    tel: '',
+    role: 'CUSTOMER' // Champ role ajouté avec valeur par défaut
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -30,7 +32,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword || !formData.tel) {
       toast.error('Veuillez remplir tous les champs');
       return;
     }
@@ -50,13 +52,36 @@ export default function RegisterPage() {
       return;
     }
 
-    const success = await register(formData.name, formData.email, formData.password);
-    
-    if (success) {
-      toast.success('Compte créé avec succès !');
-      router.push('/');
-    } else {
-      toast.error('Erreur lors de la création du compte');
+    // Préparation des données pour l'API
+    const userData = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      tel: formData.tel,
+      role: formData.role
+    };
+
+    try {
+      const response = await fetch('http://192.168.1.109:8080/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: "include",
+        body: JSON.stringify(userData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('Compte créé avec succès !');
+        router.push('/auth/login');
+      } else {
+        toast.error(data.message || 'Erreur lors de la création du compte');
+      }
+    } catch (error) {
+      toast.error('Erreur de connexion au serveur');
+      console.error('Erreur:', error);
     }
   };
 
@@ -104,6 +129,22 @@ export default function RegisterPage() {
                     placeholder="votre@email.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="tel">Numéro de téléphone</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    id="tel"
+                    type="text"
+                    placeholder="Votre numéro de téléphone"
+                    value={formData.tel}
+                    onChange={(e) => setFormData({ ...formData, tel: e.target.value })}
                     className="pl-10"
                     required
                   />
@@ -164,7 +205,7 @@ export default function RegisterPage() {
                 <Checkbox
                   id="acceptTerms"
                   checked={acceptTerms}
-                  onCheckedChange={setAcceptTerms}
+                  onCheckedChange={checked => setAcceptTerms(checked === true)}
                 />
                 <Label htmlFor="acceptTerms" className="text-sm">
                   J'accepte les{' '}
@@ -197,12 +238,6 @@ export default function RegisterPage() {
                   </Link>
                 </p>
               </div>
-            </div>
-
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <p className="text-xs text-blue-800">
-                <strong>Démo:</strong> Tous les comptes créés sont fictifs et temporaires
-              </p>
             </div>
           </CardContent>
         </Card>
