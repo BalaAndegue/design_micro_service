@@ -264,7 +264,7 @@ export default function CheckoutPage() {
                     <Checkbox
                       id="saveInfo"
                       checked={saveInfo}
-                      onCheckedChange={setSaveInfo}
+                      onCheckedChange={checked => setSaveInfo(checked === true)}
                     />
                     <Label htmlFor="saveInfo" className="text-sm">
                       Sauvegarder ces informations pour une prochaine commande
@@ -384,7 +384,7 @@ export default function CheckoutPage() {
                     <Checkbox
                       id="acceptTerms"
                       checked={acceptTerms}
-                      onCheckedChange={setAcceptTerms}
+                      onCheckedChange={checked => setAcceptTerms(checked === true)}
                     />
                     <Label htmlFor="acceptTerms" className="text-sm">
                       J'accepte les <Link href="/terms" className="text-blue-600 hover:underline">conditions générales</Link> et la <Link href="/privacy" className="text-blue-600 hover:underline">politique de confidentialité</Link> *
