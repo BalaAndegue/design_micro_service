@@ -27,8 +27,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Vérifier si l'utilisateur est connecté (localStorage simulation)
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
+      try {
       setUser(JSON.parse(savedUser));
+    } catch (error) {
+      console.error('Error parsing user from localStorage', error);
     }
+    }
+    // Simuler un délai de chargement
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    // Nettoyage de l'état de chargement lors du démontage
+    return () =>
     setIsLoading(false);
   }, []);
 
