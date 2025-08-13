@@ -71,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     // Simulation d'inscription
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((r) => setTimeout(r, 1000));
     
     if (name && email && password) {
       const newUser = {
@@ -108,3 +108,7 @@ export function useAuth() {
   }
   return context;
 }
+
+
+
+

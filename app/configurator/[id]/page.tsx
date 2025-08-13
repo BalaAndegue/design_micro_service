@@ -102,6 +102,7 @@ export default function ConfiguratorPage() {
   };
 
   const handleAddToCart = async () => {
+    console.log('message produit ajouté au panier:', mockProduct.name);
     setIsLoading(true);
     
     await new Promise(resolve => setTimeout(resolve, 1000));

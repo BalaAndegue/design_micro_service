@@ -1,5 +1,5 @@
-'use client';
 
+'use client';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -48,12 +48,12 @@ export default function LoginPage() {
 
       if (response.ok) {
         // Stockage du token JWT et des informations utilisateur
-        localStorage.setItem('token', data.accesToken);
+        localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('role', data.user.role);
         
         toast.success('Connexion réussie !');
         router.push('/');
+        window.location.reload();
       } else {
         toast.error(data.message || 'Email ou mot de passe incorrect');
       }
@@ -72,7 +72,7 @@ export default function LoginPage() {
             <span>Retour à l'accueil</span>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900">Connexion</h1>
-          <p className="text-gray-600 mt-2">Accédez à votre compte CustomCraft</p>
+          <p className="text-gray-600 mt-2">Accédez à votre compte CustomWorld</p>
         </div>
 
         <Card className="shadow-lg">
@@ -153,4 +153,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-}
+} 

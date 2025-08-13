@@ -1,5 +1,5 @@
 'use client';
-
+/*
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { Star, Search, Filter, Grid3X3, List, ShoppingCart } from 'lucide-react'
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import Link from 'next/link';
+import { useCart } from '@/providers/cart-provider';
 
 const products = [
   {
@@ -107,12 +108,93 @@ const sortOptions = [
   { value: 'rating', label: 'Mieux notés' }
 ];
 
+
+const colorOptions = [
+  { name: 'Noir', value: '#000000', premium: false },
+  { name: 'Blanc', value: '#FFFFFF', premium: false },
+  { name: 'Bleu', value: '#3B82F6', premium: false },
+  { name: 'Rouge', value: '#EF4444', premium: false },
+  { name: 'Vert', value: '#10B981', premium: false },
+  { name: 'Violet', value: '#8B5CF6', premium: false },
+  { name: 'Or Rose', value: '#F59E0B', premium: true, price: 5 },
+  { name: 'Chromé', value: '#C0C0C0', premium: true, price: 8 }
+];
+
+const patternOptions = [
+  { name: 'Aucun', value: 'none', price: 0, image: null },
+  { name: 'Rayures', value: 'stripes', price: 3, image: '/patterns/stripes.png' },
+  { name: 'Points', value: 'dots', price: 3, image: '/patterns/dots.png' },
+  { name: 'Géométrique', value: 'geometric', price: 5, image: '/patterns/geometric.png' },
+  { name: 'Floral', value: 'floral', price: 5, image: '/patterns/floral.png' },
+  { name: 'Abstrait', value: 'abstract', price: 7, image: '/patterns/abstract.png' }
+];
+
+const sizeOptions = [
+  { name: 'iPhone 15', value: 'iphone15', price: 0 },
+  { name: 'iPhone 15 Pro', value: 'iphone15pro', price: 0 },
+  { name: 'iPhone 15 Pro Max', value: 'iphone15max', price: 2 }
+];
+
+
 export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('popular');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filteredProducts, setFilteredProducts] = useState(products);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { addItem } = useCart();
+    
+  const [selectedProduct, setSelectedProduct] = useState(products[1]); // par défaut le premier produit
+
+    
+  const [selectedColor, setSelectedColor] = useState(colorOptions[0]);
+  const [selectedPattern, setSelectedPattern] = useState(patternOptions[0]);
+  const [selectedSize, setSelectedSize] = useState(sizeOptions[0]);
+  const [customText, setCustomText] = useState('');
+  const [quantity, setQuantity] = useState(1);
+  
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  
+  
+  
+
+  const calculatePrice = () => {
+  let price = selectedProduct.price; // utiliser le prix du produit sélectionné
+  if (selectedColor.premium) price += selectedColor.price || 0;
+  price += selectedPattern.price;
+  price += selectedSize.price;
+  if (customText.trim()) price += 3;
+  if (uploadedImage) price += 5; // Prix supplémentaire pour image personnalisée
+  return price;
+};
+
+  const handleAddToCart = async () => {
+  console.log('message produit ajouté au panier:', selectedProduct.name);
+  setIsLoading(true);
+  
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  addItem({
+    productId: selectedProduct.id,
+    name: selectedProduct.name,
+    price: calculatePrice(),
+    quantity,
+    image: uploadedImage || selectedProduct.image,
+    customizations: {
+      color: selectedColor.name,
+      pattern: selectedPattern.name,
+      text: customText || undefined,
+      size: selectedSize.name,
+      customImage: uploadedImage ? true : undefined
+    }
+  });
+  
+  setIsLoading(false);
+};
+
+
 
   useEffect(() => {
     let filtered = products.filter(product => {
@@ -145,17 +227,17 @@ export default function ProductsPage() {
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Header */}
+        */{/* Page Header */}/*
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Nos Produits</h1>
           <p className="text-gray-600">Découvrez notre collection complète de produits personnalisables</p>
         </div>
 
-        {/* Filtres et recherche */}
+        */{/* Filtres et recherche */}/*
         <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             <div className="flex flex-col sm:flex-row gap-4 flex-1">
-              {/* Recherche */}
+              */{/* Recherche */}/*
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
@@ -167,7 +249,7 @@ export default function ProductsPage() {
                 />
               </div>
 
-              {/* Catégorie */}
+              */{/* Catégorie */}/*
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                 <SelectTrigger className="w-full sm:w-48">
                   <SelectValue placeholder="Catégorie" />
@@ -181,7 +263,7 @@ export default function ProductsPage() {
                 </SelectContent>
               </Select>
 
-              {/* Tri */}
+              */{/* Tri */}/*
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-full sm:w-48">
                   <SelectValue placeholder="Trier par" />
@@ -196,7 +278,7 @@ export default function ProductsPage() {
               </Select>
             </div>
 
-            {/* Mode d'affichage */}
+            */{/* Mode d'affichage */}/*
             <div className="flex items-center space-x-2">
               <Button
                 variant={viewMode === 'grid' ? 'default' : 'outline'}
@@ -220,7 +302,7 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* Liste des produits */}
+        */{/* Liste des produits */}/*
         <div className={`${viewMode === 'grid' 
           ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' 
           : 'space-y-4'
@@ -266,9 +348,15 @@ export default function ProductsPage() {
                           Personnaliser
                         </Button>
                       </Link>
-                      <Button size="sm" variant="outline">
+                      <Button
+                       size="sm"
+                       variant="outline"
+                       onClick={handleAddToCart}
+                       disabled={isLoading}>
                         <ShoppingCart className="h-4 w-4" />
+                        {isLoading ? '...' : ``}
                       </Button>
+                      
                     </div>
                   </CardContent>
                 </>
@@ -323,6 +411,210 @@ export default function ProductsPage() {
             <p className="text-gray-500 text-lg">Aucun produit trouvé avec ces critères</p>
           </div>
         )}
+      </div>
+
+      <Footer />
+    </div>
+  );
+}*/
+
+
+
+
+
+import { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Star, Search, Filter, Grid3X3, List, ShoppingCart } from 'lucide-react';
+import { Header } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
+import Link from 'next/link';
+import { useCart } from '@/providers/cart-provider';
+import { fetchProducts, Product } from '@/lib/api/products';
+import { ProductCard } from '@/components/products/ProductCard';
+
+const categories = [
+  { value: 'all', label: 'Toutes les catégories' },
+  { value: 'coques', label: 'Coques' },
+  { value: 'telephones', label: 'Téléphones' },
+  { value: 'tablettes', label: 'Tablettes' },
+  { value: 'ordinateurs', label: 'Ordinateurs' },
+  { value: 'montres', label: 'Montres' },
+  { value: 'vetements', label: 'Vêtements' },
+  { value: 'accessoires', label: 'Accessoires' }
+];
+
+const sortOptions = [
+  { value: 'popular', label: 'Plus populaires' },
+  { value: 'price-low', label: 'Prix croissant' },
+  { value: 'price-high', label: 'Prix décroissant' },
+  { value: 'newest', label: 'Plus récents' },
+  { value: 'rating', label: 'Mieux notés' }
+];
+
+export default function ProductsPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [sortBy, setSortBy] = useState('popular');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const { addItem } = useCart();
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setIsLoading(true);
+        const data = await fetchProducts();
+        setProducts(data);
+        setFilteredProducts(data);
+      } catch (err) {
+        setError('Failed to load products');
+        console.error("erreur survenu lors du chargement des donnees "+err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
+  useEffect(() => {
+    let filtered = products.filter(product => {
+      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+
+    // Tri
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'price-low':
+          return a.price - b.price;
+        case 'price-high':
+          return b.price - a.price;
+        case 'rating':
+          return (b.rating || 0) - (a.rating || 0);
+        case 'newest':
+          return (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0);
+        default:
+          return (b.reviews || 0) - (a.reviews || 0);
+      }
+    });
+
+    setFilteredProducts(filtered);
+  }, [products, searchTerm, selectedCategory, sortBy]);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* ... (le reste de ton JSX existant) ... */}
+        */{/* Page Header */}/*
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Nos Produits</h1>
+          <p className="text-gray-600">Découvrez notre collection complète de produits personnalisables</p>
+        </div>
+
+        */{/* Filtres et recherche */}/*
+        <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+            <div className="flex flex-col sm:flex-row gap-4 flex-1">
+              */{/* Recherche */}/*
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  type="text"
+                  placeholder="Rechercher un produit..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              */{/* Catégorie */}/*
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-full sm:w-48">
+                  <SelectValue placeholder="Catégorie" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.value} value={category.value}>
+                      {category.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              */{/* Tri */}/*
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-full sm:w-48">
+                  <SelectValue placeholder="Trier par" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sortOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            */{/* Mode d'affichage */}/*
+            <div className="flex items-center space-x-2">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+              >
+                <Grid3X3 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="mt-4 text-sm text-gray-600">
+            {filteredProducts.length} produit{filteredProducts.length > 1 ? 's' : ''} trouvé{filteredProducts.length > 1 ? 's' : ''}
+          </div>
+        </div>
+        
+        {/* Liste des produits */}
+        <div className={`${viewMode === 'grid' 
+          ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' 
+          : 'space-y-4'
+        }`}>
+          {filteredProducts.map((product) => (
+            <ProductCard 
+              key={product.id} 
+              product={product} 
+              viewMode={viewMode}
+              onAddToCart={addItem}
+            />
+          ))}
+        </div>
+        {filteredProducts.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">Aucun produit trouvé avec ces critères</p>
+          </div>
+        )}
+        {/* ... */}
       </div>
 
       <Footer />

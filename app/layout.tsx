@@ -8,7 +8,7 @@ import { Toaster } from '@/components/ui/sonner';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'CustomCraft - Personnalisez vos produits',
+  title: 'CustomWorld - Personnalisez vos produits',
   description: 'Créez et personnalisez vos produits préférés avec notre configurateur interactif',
 };
 
