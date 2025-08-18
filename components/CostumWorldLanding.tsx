@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ShoppingBag, Star, Search, Menu, X, ArrowRight, ArrowLeft, ShieldCheck, Truck, CreditCard, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Header } from './layout/headerstes';
+//import { Header } from './layout/header';
 
 type Product = {
   id: number;
@@ -199,7 +201,7 @@ const CostumWorldLanding = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {/* Header */}{/*}
       <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'py-2 bg-white shadow-md' : 'py-4 bg-transparent'}`}>
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex justify-between items-center">
@@ -212,7 +214,7 @@ const CostumWorldLanding = () => {
               </h1>
             </div>
             
-            {/* Desktop Navigation */}
+            */}{/* Desktop Navigation */}{/*
             <nav className="hidden md:flex space-x-8">
               {['Home', 'Shop', 'Categories', 'Deals', 'About'].map((item) => (
                 <a key={item} href="#" className="font-medium text-gray-700 hover:text-blue-600 transition-colors">
@@ -248,7 +250,8 @@ const CostumWorldLanding = () => {
             </div>
           </div>
         </div>
-      </header>
+      </header>*/}
+      <Header/>
 
       {/* Mobile Menu */}
       <AnimatePresence>
@@ -356,7 +359,7 @@ const CostumWorldLanding = () => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Shop by Category</h2>
-            <a href="#" className="text-blue-600 hover:underline flex items-center">
+            <a href="products" className="text-blue-600 hover:underline flex items-center">
               View all <ArrowRight className="w-4 h-4 ml-1" />
             </a>
           </div>
@@ -383,7 +386,7 @@ const CostumWorldLanding = () => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Featured Products</h2>
-            <a href="#" className="text-blue-600 hover:underline flex items-center">
+            <a href="products" className="text-blue-600 hover:underline flex items-center">
               View all <ArrowRight className="w-4 h-4 ml-1" />
             </a>
           </div>
@@ -401,7 +404,7 @@ const CostumWorldLanding = () => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900">New Arrivals</h2>
-            <a href="#" className="text-blue-600 hover:underline flex items-center">
+            <a href="products" className="text-blue-600 hover:underline flex items-center">
               View all <ArrowRight className="w-4 h-4 ml-1" />
             </a>
           </div>

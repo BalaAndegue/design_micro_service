@@ -45,15 +45,16 @@ export default function LoginPage() {
       });
 
       const data = await response.json();
+      console.log('les donnees recus '+data)
 
       if (response.ok) {
         // Stockage du token JWT et des informations utilisateur
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('token', data.accessToken);
         localStorage.setItem('user', JSON.stringify(data.user));
         
         toast.success('Connexion réussie !');
         router.push('/');
-        window.location.reload();
+        //window.location.reload();
       } else {
         toast.error(data.message || 'Email ou mot de passe incorrect');
       }

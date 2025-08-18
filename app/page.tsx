@@ -1,5 +1,5 @@
 'use client';
-
+/*
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -70,7 +70,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
       <Header />
       
-      {/* Hero Section */}
+      */{/* Hero Section */}/*
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-orange-600/10" />
         <div className="relative max-w-7xl mx-auto">
@@ -97,7 +97,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Categories Section */}
+      */{/* Categories Section */}/*
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
@@ -119,7 +119,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Products */}
+      */{/* Featured Products */}/*
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
@@ -178,7 +178,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Section */}
+      */{/* Features Section */}/*
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
@@ -213,6 +213,19 @@ export default function HomePage() {
       </section>
 
       <Footer />
+    </div>
+  );
+}*/
+
+
+import CostumWorldLanding from "@/components/CostumWorldLanding";
+
+// Si vous utilisez App Router: import CostumWorldLanding from './components/CostumWorldLanding';
+
+export default function Home() {
+  return (
+    <div>
+      <CostumWorldLanding />
     </div>
   );
 }
