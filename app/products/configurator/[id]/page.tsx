@@ -31,7 +31,7 @@ const mockProduct = {
   id: 1,
   name: 'Coque iPhone 15 Pro',
   category: 'coques',
-  basePrice: 24.99,
+  originalPrice: 24.99,
   
   description: 'Coque de protection premium pour iPhone 15 Pro',
   image: 'https://images.pexels.com/photos/607812/pexels-photo-607812.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -74,9 +74,9 @@ export default function ConfiguratorPage() {
     name: 'Chargement...',
     rating: 0,
     category: '',
-    basePrice: 0,
+    originalPrice: 0,
     description: '',
-    imageUrl: '/placeholder.jpg'
+    imagePath: '/placeholder.jpg'
   });
   const [isLoadingProduct, setIsLoadingProduct] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -91,7 +91,7 @@ export default function ConfiguratorPage() {
 
   const calculatePrice = (): number => {
   return [
-    product?.basePrice ?? 0,
+    product?.originalPrice ?? 0,
     selectedColor.premium ? (selectedColor.price ?? 0) : 0,
     selectedPattern.price ?? 0,
     selectedSize.price ?? 0,
@@ -127,7 +127,7 @@ export default function ConfiguratorPage() {
       name: product.name ,
       price: calculatePrice(),
       quantity,
-      image: uploadedImage || product?.imageUrl || '/placeholder-product.jpg',
+      image: uploadedImage || product?.imagePath || '/placeholder-product.jpg',
       customizations: {
         color: selectedColor.name,
         pattern: selectedPattern.name,
@@ -246,7 +246,7 @@ export default function ConfiguratorPage() {
                     />
                   ) : (
                     <img 
-                      src={product.imageUrl} 
+                      src={product.imagePath} 
                       alt={product.name} 
                       className="absolute inset-0 w-full h-full object-cover"
                     />
@@ -525,7 +525,7 @@ export default function ConfiguratorPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Produit de base</span>
-                    <span>€{product.basePrice}</span>
+                    <span>€{product.originalPrice}</span>
                   </div>
                   
                   {selectedColor.premium && (

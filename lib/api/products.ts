@@ -1,15 +1,15 @@
 // app/lib/api.ts
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.1.109:8080/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.43.11:8081/api';
 
 export interface Product {
   id: number;
   name: string;
   description: string;
   category: string;
-  basePrice: number;
-  //price: number;
-  originalPrice?: number;
-  imageUrl: string;
+  //basePrice: number;
+  price?: number;
+  originalPrice: number;
+  imagePath: string;
   rating?: number;
   reviews?: number;
   isNew?: boolean;
@@ -25,6 +25,8 @@ export interface Stats {
   totalProducts: number;
   categories: Array<{ category: string; count: number }>;
   onSaleProducts: number;
+  newUsersThisMonth: number;
+  totalUsers: number;
 }
 
 const getAuthHeaders = () => {
@@ -67,7 +69,7 @@ export const fetchProducts = async (): Promise<Product[]> => {
 
 
 export async function fetchProductById(id: string): Promise<Product> {
-  const response = await fetch(`/api/products/${id}`,{
+  const response = await fetch(`/vendor/products/${id}`,{
     method: 'GET',
     headers: getAuthHeaders(),
     cache: 'no-store',
@@ -91,6 +93,19 @@ export const createProduct = async (product: Omit<Product, 'id' | 'createdAt' | 
     console.error('Error creating product:', error);
     throw new Error('Unable to create product.');
   }
+};
+
+export const patchProduct = async (
+  id: number, 
+  updates: Partial<Omit<Product, 'id' | 'createdAt' | 'updatedAt'>>
+): Promise<Product> => {
+  const response = await fetch(`/api/products/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  });
+  if (!response.ok) throw new Error('Erreur lors de la mise à jour partielle du produit');
+  return response.json();
 };
 
 export const updateProduct = async (id: number, product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> => {

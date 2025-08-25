@@ -3,10 +3,10 @@ export interface Product {
   name: string;
   description: string;
   category: string;
-  basePrice: number;
-  //price: number;
+  
+  price?: number;
   originalPrice?: number;
-  imageUrl: string;
+  imagePath: string;
   rating?: number;
   reviews?: number;
   isNew?: boolean;

@@ -622,7 +622,7 @@ export default function ProductsPage() {
   );
 }*/
 
-'use client';
+
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -727,9 +727,9 @@ export default function ProductsPage(
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'price-low':
-          return a.basePrice - b.basePrice;
+          return a.originalPrice || 0 - b.originalPrice ;
         case 'price-high':
-          return b.basePrice - a.basePrice;
+          return b.originalPrice || 0 - a.originalPrice;
         case 'rating':
           return (b.rating || 0) - (a.rating || 0);
         case 'newest':

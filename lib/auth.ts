@@ -24,7 +24,8 @@ export const getUserRole = (): string | null => {
 // app/lib/auth.ts
 export const isAdmin = (): boolean => {
   if (typeof window === 'undefined') return false;
-  const role = localStorage.getItem('role');
+  const user = localStorage.getItem('user');
+  const role = user ? JSON.parse(user).role : null;
   return role === 'ADMIN';
 };
 

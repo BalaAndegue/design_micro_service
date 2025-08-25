@@ -21,7 +21,7 @@ export function ProductCard({
         <>
           <div className="relative">
             <img
-              src={product.imageUrl}
+              src={product.imagePath}
               alt={product.name}
               className="w-full h-48 object-cover rounded-t-lg"
             />
@@ -44,7 +44,7 @@ export function ProductCard({
             </div>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
-                <span className="text-lg font-bold text-blue-600">€{product.price}</span>
+                <span className="text-lg font-bold text-blue-600">€{product.originalPrice}</span>
                 {product.originalPrice && (
                   <span className="text-sm text-gray-500 line-through">€{product.originalPrice}</span>
                 )}
@@ -62,9 +62,9 @@ export function ProductCard({
                 onClick={() => onAddToCart(
                     { productId: product.id, 
                         name: product.name, 
-                        price: product.price, 
+                        price: product.originalPrice || 0, 
                         quantity: 1,
-                        image: product.imageUrl,
+                        image: product.imagePath,
                         customizations: {}
                 })}
               >
@@ -77,7 +77,7 @@ export function ProductCard({
         <CardContent className="p-6">
           <div className="flex gap-4">
             <img
-              src={product.imageUrl}
+              src={product.imagePath}
               alt={product.name}
               className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
             />
@@ -97,7 +97,7 @@ export function ProductCard({
                 </div>
                 <div className="text-right">
                   <div className="flex items-center space-x-2 mb-2">
-                    <span className="text-lg font-bold text-blue-600">€{product.price}</span>
+                    <span className="text-lg font-bold text-blue-600">€{product.originalPrice}</span>
                     {product.originalPrice && (
                       <span className="text-sm text-gray-500 line-through">€{product.originalPrice}</span>
                     )}
@@ -113,9 +113,9 @@ export function ProductCard({
                       variant="outline"
                       onClick={() => onAddToCart({ productId: product.id, 
                         name: product.name, 
-                        price: product.price, 
+                        price: product.originalPrice || 0, 
                         quantity: 1,
-                        image: product.imageUrl,
+                        image: product.imagePath,
                         customizations: {}
                 })}
                     >

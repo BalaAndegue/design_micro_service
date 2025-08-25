@@ -32,7 +32,7 @@ export default function LoginPage() {
 
     try {
       // Appel à l'API Spring Boot
-      const response = await fetch('http://192.168.1.109:8080/api/auth/login', {
+      const response = await fetch('http://192.168.43.11:8081/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,11 +48,19 @@ export default function LoginPage() {
       console.log('les donnees recus '+data)
 
       if (response.ok) {
+        //on recupere le role de celui qui s'est connecter
+        const userRole = data.user.role;
         // Stockage du token JWT et des informations utilisateur
         localStorage.setItem('token', data.accessToken);
         localStorage.setItem('user', JSON.stringify(data.user));
         
         toast.success('Connexion réussie !');
+        if (userRole === 'ADMIN') {
+          router.push('/admin');
+          //window.location.reload();
+          return;
+        }
+
         router.push('/');
         //window.location.reload();
       } else {
