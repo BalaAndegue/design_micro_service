@@ -159,19 +159,19 @@ const CostumWorldLanding = () => {
     {
       title: "Summer Collection 2025",
       subtitle: "Discover our new arrivals",
-      image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1000",
+      image: "https://i.pinimg.com/736x/76/4d/73/764d73cb49c3dac16cce4794d914a1f4.jpg",
       cta: "Shop Now"
     },
     {
       title: "Tech Gadgets Sale",
       subtitle: "Up to 40% off on selected items",
-      image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000",
+      image: "https://i.pinimg.com/736x/49/a6/d2/49a6d288b894d7fd815e1dfa3862e508.jpg",
       cta: "Explore Deals"
     },
     {
       title: "Premium Membership",
       subtitle: "Get exclusive benefits & early access",
-      image: "https://images.unsplash.com/photo-1525904097878-94fb15835963?q=80&w=1000",
+      image: "https://i.pinimg.com/1200x/73/23/00/732300c26e3c0d2a7048fd605da7be4e.jpg",
       cta: "Join Now"
     }
   ];

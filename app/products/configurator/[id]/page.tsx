@@ -73,6 +73,7 @@ export default function ConfiguratorPage() {
     id: 0,
     name: 'Chargement...',
     rating: 0,
+    price: 0,
     category: '',
     originalPrice: 0,
     description: '',
@@ -85,7 +86,7 @@ export default function ConfiguratorPage() {
   const [selectedSize, setSelectedSize] = useState(sizeOptions[0]);
   const [customText, setCustomText] = useState('');
   const [quantity, setQuantity] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -127,7 +128,7 @@ export default function ConfiguratorPage() {
       name: product.name ,
       price: calculatePrice(),
       quantity,
-      image: uploadedImage || product?.imagePath || '/placeholder-product.jpg',
+      image: uploadedImage || product?.imagePath || '',
       customizations: {
         color: selectedColor.name,
         pattern: selectedPattern.name,
@@ -165,7 +166,7 @@ export default function ConfiguratorPage() {
         const data = await fetchProductById(productId);
         setProduct(data);
       } catch (err) {
-        setError('Erreur lors du chargement du produit');
+        setError('Erreur lors du chargement du produit '+err);
         console.error(err);
       } finally {
         setIsLoadingProduct(false);

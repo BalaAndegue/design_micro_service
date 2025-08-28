@@ -29,6 +29,13 @@ export const isAdmin = (): boolean => {
   return role === 'ADMIN';
 };
 
+export const isvendor = ():boolean => {
+  if (typeof window === 'undefined') return false;
+  const user = localStorage.getItem('user');
+  const role = user ? JSON.parse(user).role : null;
+  return role ;
+}
+
 export const isAuthenticated = (): boolean => {
   if (typeof window === 'undefined') return false;
   return !!localStorage.getItem('token');

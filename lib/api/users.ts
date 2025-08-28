@@ -1,24 +1,34 @@
 // lib/api/users.ts
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.43.11:8081/api';
 export interface User {
   id: number;
   name: string | null;
   email: string;
+  phone: string | null;
   password: string;
-  role: 'user' | 'admin';
+  role: 'CUSTOMER' | 'ADMIN' |'VENDOR';
   createdAt: string;
 }
-
+const getAuthHeaders = () => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return headers;
+};
 export const fetchUsers = async (): Promise<User[]> => {
   // Implémentation pour récupérer les utilisateurs
-  const response = await fetch('/api/users');
+  const response = await fetch(`${API_URL}/admin/users`,{
+    method: 'GET',
+    headers: getAuthHeaders(),  
+  });
   if (!response.ok) throw new Error('Erreur lors de la récupération des utilisateurs');
   return response.json();
 };
 
 export const createUser = async (user: Omit<User, 'id' | 'createdAt'>): Promise<User> => {
-  const response = await fetch('/api/users', {
+  const response = await fetch(`${API_URL}/admin/users`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(user),
   });
   if (!response.ok) throw new Error('Erreur lors de la création de l\'utilisateur');

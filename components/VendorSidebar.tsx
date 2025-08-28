@@ -1,6 +1,5 @@
 // components/AdminSidebar.tsx
-import { ActiveSection } from '@/app/admin/page';
-
+import { ActiveSection } from '@/app/vendor/page';
 import {
   Building2,
   ChevronLeft,
@@ -14,24 +13,25 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-interface AdminSidebarProps {
+
+interface VendorSidebarProps {
   activeSection: ActiveSection;
   setActiveSection: (section: ActiveSection) => void;
 }
 
-export default function AdminSidebar({ activeSection, setActiveSection }: AdminSidebarProps) {
+export default function VendorSidebar({ activeSection, setActiveSection }: VendorSidebarProps) {
   const menuItems = [
-    { id: 'dashboard', label: 'Tableau de Bord', icon: Building2 },
+    { id: 'dashboard', label: 'Tableau de Bord', icon:Building2 },
     { id: 'products', label: 'Produits', icon: ShoppingCart },
-    { id: 'users', label: 'Utilisateurs', icon: Users },
+    
     { id: 'orders', label: 'Commandes', icon: CreditCard },
     { id: 'settings', label: 'Paramètres', icon: Settings },
   ] as const;
 
   return (
-    <div className="w-64 bg-blue-700 text-white">
+    <div className="w-64 bg-orange-800 text-white">
       <div className="p-4 border-b border-gray-700">
-        <h2 className="text-xl font-semibold">Administration</h2>
+        <h2 className="text-xl font-semibold">Vendeurs</h2>
       </div>
       <nav className="p-4">
         <ul className="space-y-2">

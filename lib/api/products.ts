@@ -7,7 +7,7 @@ export interface Product {
   description: string;
   category: string;
   //basePrice: number;
-  price?: number;
+  price: number;
   originalPrice: number;
   imagePath: string;
   rating?: number;
@@ -28,7 +28,10 @@ export interface Stats {
   newUsersThisMonth: number;
   totalUsers: number;
 }
-
+const user = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+const userid = user ? JSON.parse(user).id : null;
+const userrole = user ?JSON.parse(user).role : null;
+//console.log('le user id est '+userid)
 const getAuthHeaders = () => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -69,7 +72,7 @@ export const fetchProducts = async (): Promise<Product[]> => {
 
 
 export async function fetchProductById(id: string): Promise<Product> {
-  const response = await fetch(`/vendor/products/${id}`,{
+  const response = await fetch(`${API_URL}/vendor/products/${id}`,{
     method: 'GET',
     headers: getAuthHeaders(),
     cache: 'no-store',
@@ -82,10 +85,10 @@ export async function fetchProductById(id: string): Promise<Product> {
 
 export const createProduct = async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> => {
   try {
-    const res = await fetch(`${API_URL}/admin/products`, {
+    const res = await fetch(`${API_URL}/vendor/products`, {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify(product),
+      body: JSON.stringify(product,userid),
     });
     if (!res.ok) throw new Error(`Failed to create product: ${res.status} ${res.statusText}`);
     return res.json();
@@ -108,9 +111,9 @@ export const patchProduct = async (
   return response.json();
 };
 
-export const updateProduct = async (id: number, product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> => {
+export const updateProduct = async (id: number, product: Partial<Omit<Product, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Product> => {
   try {
-    const res = await fetch(`${API_URL}/admin/products/${id}`, {
+    const res = await fetch(`${API_URL}/vendor/products/${id}`, {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(product),
@@ -125,7 +128,7 @@ export const updateProduct = async (id: number, product: Omit<Product, 'id' | 'c
 
 export const deleteProduct = async (id: number): Promise<void> => {
   try {
-    const res = await fetch(`${API_URL}/admin/products/${id}`, {
+    const res = await fetch(`${API_URL}/vendor/products/${id}`, {
       method: 'DELETE',
       headers: getAuthHeaders(),
     });

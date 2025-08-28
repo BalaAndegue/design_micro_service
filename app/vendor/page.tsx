@@ -2,14 +2,13 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { fetchStats, fetchProducts, createProduct, patchProduct, deleteProduct, Product, updateProduct } from '@/lib/api/products';
-import { fetchUsers, createUser, updateUser, deleteUser, User } from '@/lib/api/users';
-import { isAdmin } from '@/lib/auth';
-import AdminSidebar from '@/components/AdminSidebar';
-import ProductsManagement from '@/components/ProductsManagement';
-import UsersManagement from '@/components/UsersManagement';
-import DashboardStats from '@/components/DashboardStats';
+import { fetchStats, fetchProducts, createProduct,  deleteProduct, Product, updateProduct } from '@/lib/api/products';
+import { fetchUsers,  User } from '@/lib/api/users';
+import { isAdmin, isvendor } from '@/lib/auth';
 
+import VendorSidebar from '@/components/VendorSidebar';
+import ProductsManagement from '@/components/ProductsManagement';
+import DashboardStats from '@/components/DashboardStats';
 
 export interface Stats {
   totalProducts: number;
@@ -20,7 +19,7 @@ export interface Stats {
 }
 
 
-export type ActiveSection = 'dashboard' | 'products' | 'users' | 'orders' | 'settings';
+export type ActiveSection = 'dashboard' | 'products' | 'orders' | 'settings';
 
 export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState<ActiveSection>('dashboard');
@@ -34,9 +33,9 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAdmin()) {
+    if (!isvendor()) {
       router.push('/auth/login');
-      setError('Accès réservé aux administrateurs');
+      setError('Accès réservé aux vendeurs');
       return;
     }
 
@@ -105,39 +104,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleCreateUser = async (userData: Omit<User, 'id' | 'createdAt'>) => {
-    try {
-      const created = await createUser(userData);
-      setUsers([...users, created]);
-      return { success: true };
-    } catch (err) {
-      setError('Échec de la création de l\'utilisateur');
-      return { success: false, error: 'Échec de la création de l\'utilisateur' };
-    }
-  };
-
-  const handleUpdateUser = async (id: number, userData: Partial<User>) => {
-    try {
-      const updated = await updateUser(id, userData);
-      setUsers(users.map((u) => (u.id === updated.id ? updated : u)));
-      return { success: true };
-    } catch (err) {
-      setError('Échec de la mise à jour de l\'utilisateur');
-      return { success: false, error: 'Échec de la mise à jour de l\'utilisateur' };
-    }
-  };
-
-  const handleDeleteUser = async (id: number) => {
-    try {
-      await deleteUser(id);
-      setUsers(users.filter((u) => u.id !== id));
-      return { success: true };
-    } catch (err) {
-      setError('Échec de la suppression de l\'utilisateur');
-      return { success: false, error: 'Échec de la suppression de l\'utilisateur' };
-    }
-  };
-
+  
   const renderActiveSection = () => {
     if (isLoading) {
       return (
@@ -159,15 +126,7 @@ export default function AdminDashboard() {
             onDeleteProduct={handleDeleteProduct}
           />
         );
-      case 'users':
-        return (
-          <UsersManagement
-            users={users}
-            onCreateUser={handleCreateUser}
-            onUpdateUser={handleUpdateUser}
-            onDeleteUser={handleDeleteUser}
-          />
-        );
+     
       case 'orders':
         return <div className="p-6">Gestion des commandes - À implémenter</div>;
       case 'settings':
@@ -183,7 +142,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex h- , screen bg-gray-100">
-      <AdminSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
+      <VendorSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
       
       <div className="flex-1 overflow-auto">
         <header className="bg-white shadow-sm">
@@ -191,7 +150,7 @@ export default function AdminDashboard() {
             <h1 className="text-2xl font-semibold text-gray-900">
               {activeSection === 'dashboard' && 'Tableau de Bord'}
               {activeSection === 'products' && 'Gestion des Produits'}
-              {activeSection === 'users' && 'Gestion des Utilisateurs'}
+              
               {activeSection === 'orders' && 'Gestion des Commandes'}
               {activeSection === 'settings' && 'Paramètres'}
             </h1>
@@ -204,9 +163,9 @@ export default function AdminDashboard() {
               <div className="relative">
                 <button className="flex items-center space-x-2">
                   <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
-                    A
+                    V
                   </div>
-                  <span className="text-gray-700">Admin</span>
+                  <span className="text-gray-700">Vendeur</span>
                 </button>
               </div>
             </div>

@@ -59,6 +59,10 @@ export default function LoginPage() {
           router.push('/admin');
           //window.location.reload();
           return;
+        } else if (userRole === 'VENDOR') {
+          router.push('/vendor');
+          //window.location.reload();
+          return;
         }
 
         router.push('/');

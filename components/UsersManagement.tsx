@@ -21,9 +21,20 @@ export default function UsersManagement({
   const [newUser, setNewUser] = useState<Omit<User, 'id' | 'createdAt'>>({
     name: '',
     email: '',
+    phone:'',
     password: '',
-    role: 'user',
+    role: 'CUSTOMER',
   });
+
+  const getInitials = (user: { name?: string | null; email?: string }) => {
+  if (user.name) {
+    return user.name.charAt(0).toUpperCase();
+  }
+  if (user.email) {
+    return user.email.charAt(0).toUpperCase();
+  }
+  return 'U'; // Default pour utilisateur sans nom ni email
+};
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,8 +44,9 @@ export default function UsersManagement({
       setNewUser({
         name: '',
         email: '',
+        phone:'',
         password: '',
-        role: 'user',
+        role: 'CUSTOMER',
       });
     }
   };
@@ -100,7 +112,7 @@ export default function UsersManagement({
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
                       <span className="text-blue-600 font-semibold">
-                        {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+                        {getInitials(user)}
                       </span>
                     </div>
                     <div className="ml-4">
@@ -113,11 +125,23 @@ export default function UsersManagement({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    user.role === 'admin' 
+                    user.role === 'ADMIN' 
                       ? 'bg-purple-100 text-purple-800' 
                       : 'bg-green-100 text-green-800'
                   }`}>
-                    {user.role === 'admin' ? 'Administrateur' : 'Utilisateur'}
+                    {(() => {
+                      switch (user.role) {
+                        case 'ADMIN':
+                          return 'Administrateur';
+                        case 'CUSTOMER':
+                          return 'Client';
+                        case 'VENDOR':
+                          return '  vendeur';
+                        
+                        default:
+                          return 'Utilisateur'; // Fallback
+                      }
+                    })()}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -176,6 +200,16 @@ export default function UsersManagement({
                 />
               </div>
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">phone</label>
+                <input
+                  type="phone"
+                  value={newUser.phone || ''}
+                  onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
                 <input
                   type="password"
@@ -189,11 +223,12 @@ export default function UsersManagement({
                 <label className="block text-sm font-medium text-gray-700 mb-1">Rôle</label>
                 <select
                   value={newUser.role}
-                  onChange={(e) => setNewUser({ ...newUser, role: e.target.value as 'user' | 'admin' })}
+                  onChange={(e) => setNewUser({ ...newUser, role: e.target.value as 'CUSTOMER' | 'ADMIN' |'VENDOR' })}
                   className="w-full border border-gray-300 rounded-md px-3 py-2"
                 >
-                  <option value="user">Utilisateur</option>
-                  <option value="admin">Administrateur</option>
+                  <option value="CUSTOMER">Utilisateur</option>
+                  <option value="ADMIN">Administrateur</option>
+                  <option value="VENDOR">Vendeur</option>
                 </select>
               </div>
               <div className="flex justify-end space-x-3 pt-4">
@@ -252,7 +287,7 @@ export default function UsersManagement({
                 <label className="block text-sm font-medium text-gray-700 mb-1">Rôle</label>
                 <select
                   value={editingUser.role}
-                  onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value as 'user' | 'admin' })}
+                  onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value as 'CUSTOMER' | 'ADMIN' })}
                   className="w-full border border-gray-300 rounded-md px-3 py-2"
                 >
                   <option value="user">Utilisateur</option>
