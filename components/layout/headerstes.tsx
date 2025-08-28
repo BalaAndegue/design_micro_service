@@ -25,6 +25,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import logo_coupé_noir from '@/app/assets/logo_coupé_noir.png';
+
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -36,7 +38,7 @@ export function Header() {
   const navigation = [
     { name: 'Home', href: '/' },
     { name: 'Products', href: '/products' },
-    { name: 'Configurator', href: '/configurator' },
+    { name: 'Configurator', href: '/configurator/1' },
     { name: 'About', href: '/about' },
   ];
 
@@ -64,7 +66,7 @@ export function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <div className="bg-gradient-to-r from-blue-600 to-orange-600 p-2 rounded-lg flex items-center justify-center">
-              <Palette className="h-6 w-6 text-white" />
+              <img src={logo_coupé_noir.src} alt="CustomWorld Logo" className="h-8 w-8" />
             </div>
             <span
               className={`text-xl font-bold ${

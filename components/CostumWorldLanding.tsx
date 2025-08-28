@@ -100,7 +100,7 @@ const CostumWorldLanding = () => {
       category: 'Audio',
       rating: 4,
       reviews: 124,
-      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000',
+      image: 'https://i.pinimg.com/1200x/71/61/f0/7161f0a9b3e3ee2de590d2e6999bef50.jpg',
       isNew: true
     },
     {
@@ -110,7 +110,7 @@ const CostumWorldLanding = () => {
       category: 'Electronics',
       rating: 5,
       reviews: 89,
-      image: 'https://images.unsplash.com/photo-1546538915-a9e2c8a1df80?q=80&w=1000'
+      image: 'https://i.pinimg.com/736x/80/01/d1/8001d1878aba9f9411a19b9dd241679f.jpg'
     },
     {
       id: 3,
@@ -119,7 +119,7 @@ const CostumWorldLanding = () => {
       category: 'Furniture',
       rating: 4,
       reviews: 56,
-      image: 'https://images.unsplash.com/photo-1517705008128-361805f42e86?q=80&w=1000',
+      image: 'https://i.pinimg.com/736x/8f/ef/69/8fef694a8c62105312124e56800cdd46.jpg',
       isNew: true
     },
     {
@@ -129,7 +129,7 @@ const CostumWorldLanding = () => {
       category: 'Wearables',
       rating: 3,
       reviews: 201,
-      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000'
+      image: 'https://i.pinimg.com/736x/64/68/2f/64682f6549b1451c257ada436dc3b68a.jpg'
     },
     {
       id: 5,
@@ -138,7 +138,7 @@ const CostumWorldLanding = () => {
       category: 'Accessories',
       rating: 4,
       reviews: 312,
-      image: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=1000'
+      image: 'https://i.pinimg.com/736x/5c/0f/05/5c0f056b2cf4fe6b7e386ff24f0827fa.jpg'
     },
     {
       id: 6,
@@ -147,7 +147,7 @@ const CostumWorldLanding = () => {
       category: 'Audio',
       rating: 5,
       reviews: 178,
-      image: 'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?q=80&w=1000'
+      image: 'https://i.pinimg.com/1200x/52/96/db/5296db3a11fe3d91731680553e6646f6.jpg'
     }
   ];
 

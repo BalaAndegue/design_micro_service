@@ -34,7 +34,7 @@ export function Header() {
   const navigation = [
     { name: 'Accueil', href: '/' },
     { name: 'Produits', href: '/products' },
-    { name: 'Configurateur', href: '/configurator' },
+    { name: 'Configurateur', href: '/configurator/1' },
     { name: 'À propos', href: '/about' },
   ];
 
