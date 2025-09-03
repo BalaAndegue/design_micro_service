@@ -3,21 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { ChevronRight, ShoppingBag, Star, Search, Menu, X, ArrowRight, ArrowLeft, ShieldCheck, Truck, CreditCard, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from './layout/headerstes';
-//import { Header } from './layout/header';
+import { Product, fetchProducts } from '@/lib/api/products';
+import { Footer } from '@/components/layout/footer';
 
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  category: string;
-  rating: number;
-  reviews: number;
+type ProductWithImage = Product & {
   image: string;
-  isNew?: boolean;
 };
 
 interface ProductCardProps {
-  product: Product;
+  product: ProductWithImage;
   index: number;
 }
 
@@ -31,13 +25,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
     >
       <div className="relative pt-[100%] overflow-hidden">
         <img 
-          src={product.image} 
+          src={product.imagePath || '/placeholder-image.jpg'} 
           alt={product.name}
           className="absolute top-0 left-0 w-full h-full object-cover hover:scale-105 transition-transform duration-500"
         />
-        {product.isNew && (
+        {product.new && (
           <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
             NEW
+          </div>
+        )}
+        {product.onSale && (
+          <div className="absolute top-3 right-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+            PROMO
           </div>
         )}
         <div className="absolute bottom-3 right-3 bg-white/80 backdrop-blur-sm rounded-full p-2">
@@ -47,7 +46,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
       <div className="p-4 flex-grow flex flex-col">
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-semibold text-gray-900">{product.name}</h3>
-          <div className="text-sm font-bold text-blue-600">${product.price}</div>
+          <div className="flex flex-col items-end">
+            <div className="text-sm font-bold text-blue-600">${product.price}</div>
+            {product.originalPrice > product.price && (
+              <div className="text-xs text-gray-500 line-through">${product.originalPrice}</div>
+            )}
+          </div>
         </div>
         <p className="text-gray-500 text-sm mb-3">{product.category}</p>
         <div className="flex items-center mt-auto">
@@ -55,11 +59,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
             {[...Array(5)].map((_, i) => (
               <Star 
                 key={i} 
-                className={`w-4 h-4 ${i < product.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
+                className={`w-4 h-4 ${i < (product.rating || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
               />
             ))}
           </div>
-          <span className="text-gray-500 text-xs ml-1">({product.reviews})</span>
+          <span className="text-gray-500 text-xs ml-1">({product.reviews || 0})</span>
         </div>
       </div>
     </motion.div>
@@ -91,65 +95,9 @@ const CostumWorldLanding = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
-
-  const featuredProducts = [
-    {
-      id: 1,
-      name: 'Premium Wireless Headphones',
-      price: 199.99,
-      category: 'Audio',
-      rating: 4,
-      reviews: 124,
-      image: 'https://i.pinimg.com/1200x/71/61/f0/7161f0a9b3e3ee2de590d2e6999bef50.jpg',
-      isNew: true
-    },
-    {
-      id: 2,
-      name: 'Ultra HD Smart TV',
-      price: 899.99,
-      category: 'Electronics',
-      rating: 5,
-      reviews: 89,
-      image: 'https://i.pinimg.com/736x/80/01/d1/8001d1878aba9f9411a19b9dd241679f.jpg'
-    },
-    {
-      id: 3,
-      name: 'Ergonomic Office Chair',
-      price: 249.99,
-      category: 'Furniture',
-      rating: 4,
-      reviews: 56,
-      image: 'https://i.pinimg.com/736x/8f/ef/69/8fef694a8c62105312124e56800cdd46.jpg',
-      isNew: true
-    },
-    {
-      id: 4,
-      name: 'Smart Fitness Watch',
-      price: 159.99,
-      category: 'Wearables',
-      rating: 3,
-      reviews: 201,
-      image: 'https://i.pinimg.com/736x/64/68/2f/64682f6549b1451c257ada436dc3b68a.jpg'
-    },
-    {
-      id: 5,
-      name: 'Wireless Charging Pad',
-      price: 39.99,
-      category: 'Accessories',
-      rating: 4,
-      reviews: 312,
-      image: 'https://i.pinimg.com/736x/5c/0f/05/5c0f056b2cf4fe6b7e386ff24f0827fa.jpg'
-    },
-    {
-      id: 6,
-      name: 'Bluetooth Speaker',
-      price: 129.99,
-      category: 'Audio',
-      rating: 5,
-      reviews: 178,
-      image: 'https://i.pinimg.com/1200x/52/96/db/5296db3a11fe3d91731680553e6646f6.jpg'
-    }
-  ];
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const categories = [
     'Electronics', 'Fashion', 'Home & Garden', 'Beauty', 'Sports', 'Toys'
@@ -176,6 +124,24 @@ const CostumWorldLanding = () => {
     }
   ];
 
+  // Récupérer les produits depuis le backend
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        const productsData = await fetchProducts();
+        setProducts(productsData);
+      } catch (err) {
+        setError('Erreur lors du chargement des produits');
+        console.error('Error loading products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -199,58 +165,18 @@ const CostumWorldLanding = () => {
     setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
   };
 
+  // Filtrer les produits pour Featured Products (3 premiers avec New = true)
+  const featuredProducts = products
+    .filter(product => product.new)
+    .slice(0, 3);
+
+  // Filtrer les produits pour New Arrivals (produits avec onSlae = true)
+  const newArrivalProducts = products
+    .filter(product => product.onSale);
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}{/*}
-      <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'py-2 bg-white shadow-md' : 'py-4 bg-transparent'}`}>
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <ShoppingBag className="w-5 h-5 text-white" />
-              </div>
-              <h1 className="text-xl font-bold text-gray-800">
-                costum<span className="text-blue-600">world</span>
-              </h1>
-            </div>
-            
-            */}{/* Desktop Navigation */}{/*
-            <nav className="hidden md:flex space-x-8">
-              {['Home', 'Shop', 'Categories', 'Deals', 'About'].map((item) => (
-                <a key={item} href="#" className="font-medium text-gray-700 hover:text-blue-600 transition-colors">
-                  {item}
-                </a>
-              ))}
-            </nav>
-            
-            <div className="flex items-center space-x-4">
-              <button className="p-2 text-gray-700 hover:text-blue-600">
-                <Search className="w-5 h-5" />
-              </button>
-              <button className="p-2 text-gray-700 hover:text-blue-600 relative">
-                <ShoppingBag className="w-5 h-5" />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  3
-                </span>
-              </button>
-              <button 
-                className="md:hidden p-2 text-gray-700"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-              >
-                {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </button>
-              <div className="hidden md:flex space-x-3">
-                <button className="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                  LOGIN
-                </button>
-                <button className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity">
-                  SIGN UP
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>*/}
+      {/* Header */}
       <Header/>
 
       {/* Mobile Menu */}
@@ -391,11 +317,21 @@ const CostumWorldLanding = () => {
             </a>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredProducts.slice(0, 3).map((product, index) => (
-              <ProductCard key={product.id} product={product} index={index} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+          ) : featuredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredProducts.map((product, index) => (
+                <ProductCard key={product.id} product={{...product, image: product.imagePath}} index={index} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              Aucun produit vedette disponible pour le moment.
+            </div>
+          )}
         </div>
       </section>
 
@@ -409,11 +345,21 @@ const CostumWorldLanding = () => {
             </a>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredProducts.slice(3).map((product, index) => (
-              <ProductCard key={product.id} product={product} index={index} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+          ) : newArrivalProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {newArrivalProducts.map((product, index) => (
+                <ProductCard key={product.id} product={{...product, image: product.imagePath}} index={index} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              Aucune nouvelle arrivée en promotion pour le moment.
+            </div>
+          )}
         </div>
       </section>
 
@@ -466,79 +412,7 @@ const CostumWorldLanding = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-gray-300 py-12">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <ShoppingBag className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-white">
-                  costum<span className="text-blue-400">world</span>
-                </h3>
-              </div>
-              <p className="mb-4">
-                Your one-stop shop for all the latest products and trends in 2025.
-              </p>
-              <div className="flex space-x-4">
-                {['twitter', 'facebook', 'instagram', 'linkedin'].map((social) => (
-                  <a key={social} href="#" className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
-                    <span className="sr-only">{social}</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-bold text-lg mb-4">Shop</h4>
-              <ul className="space-y-2">
-                {['All Products', 'New Arrivals', 'Featured', 'Discounts'].map((item) => (
-                  <li key={item}>
-                    <a href="#" className="hover:text-white transition-colors">{item}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-bold text-lg mb-4">Customer Service</h4>
-              <ul className="space-y-2">
-                {['Contact Us', 'FAQs', 'Shipping Policy', 'Returns & Exchanges'].map((item) => (
-                  <li key={item}>
-                    <a href="#" className="hover:text-white transition-colors">{item}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-bold text-lg mb-4">Newsletter</h4>
-              <p className="mb-4">
-                Subscribe to get updates on new arrivals and special offers.
-              </p>
-              <div className="flex">
-                <input 
-                  type="email" 
-                  placeholder="Your email" 
-                  className="px-4 py-2 bg-gray-700 text-white rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
-                />
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-r-lg hover:bg-blue-700 transition-colors">
-                  Subscribe
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p>© 2025 CostumWorld. All rights reserved.</p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       {/* Floating CTA */}
       <motion.div
@@ -558,5 +432,5 @@ const CostumWorldLanding = () => {
     </div>
   );
 };
-
+   
 export default CostumWorldLanding;

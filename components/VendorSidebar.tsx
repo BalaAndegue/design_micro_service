@@ -12,6 +12,7 @@ import {
   ShoppingCart,
   Users,
   Wallet,
+  LogOutIcon
 } from "lucide-react";
 
 interface VendorSidebarProps {
@@ -56,8 +57,8 @@ export default function VendorSidebar({ activeSection, setActiveSection }: Vendo
       </nav>
       <div className="absolute bottom-0 w-64 p-4 border-t border-gray-700">
         <button className="flex items-center space-x-2 text-gray-300 hover:text-white">
-          <span>🚪</span>
-          <span>Déconnexion</span>
+          
+          <span><LogOutIcon className="h-4 w-4 text-primary-foreground" /></span>
         </button>
       </div>
     </div>

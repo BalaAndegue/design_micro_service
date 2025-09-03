@@ -1,7 +1,22 @@
 // components/ProductsManagement.tsx
 'use client';
-import { useState } from 'react';
-import { Product } from '@/lib/api/products';
+import { useState, useEffect } from 'react';
+import { Product, Category, fetchCategories } from '@/lib/api/products';
+import { useCart } from '@/providers/cart-provider';
+import { Search, Grid3X3, List, Filter, Calendar } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const sortOptions = [
+  { value: 'popular', label: 'Plus populaires' },
+  { value: 'price-low', label: 'Prix croissant' },
+  { value: 'price-high', label: 'Prix décroissant' },
+  { value: 'newest', label: 'Plus récents' },
+  { value: 'rating', label: 'Mieux notés' },
+  { value: 'date-added', label: 'Date d\'ajout' }
+];
 
 interface ProductsManagementProps {
   products: Product[];
@@ -25,14 +40,27 @@ export default function ProductsManagement({
     price: 0,
     originalPrice: 0,
     imagePath: '',
-    isNew: false,
-    isOnSale: false,
-    colors: [],
+    new: false,
+    onSale: false,
+    color: [],
     sizes: [],
     patterns: [],
     rating: 0,
     reviews: 0,
   });
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('popular');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [dateFilter, setDateFilter] = useState<string>('all');
+  const [showFilters, setShowFilters] = useState(false);
+
+  const { addItem } = useCart();
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,9 +74,9 @@ export default function ProductsManagement({
         price: 0,
         originalPrice: 0,
         imagePath: '',
-        isNew: false,
-        isOnSale: false,
-        colors: [],
+        new: false,
+        onSale: false,
+        color: [],
         sizes: [],
         patterns: [],
         rating: 0,
@@ -68,9 +96,9 @@ export default function ProductsManagement({
       price: editingProduct.price,
       originalPrice: editingProduct.originalPrice,
       imagePath: editingProduct.imagePath,
-      isNew: editingProduct.isNew,
-      isOnSale: editingProduct.isOnSale,
-      colors: editingProduct.colors,
+      new: editingProduct.new,
+      onSale: editingProduct.onSale,
+      color: editingProduct.color,
       sizes: editingProduct.sizes,
       patterns: editingProduct.patterns,
     });
@@ -86,7 +114,7 @@ export default function ProductsManagement({
     }
   };
 
-  const handleArrayInput = (field: 'colors' | 'sizes' | 'patterns', value: string, isEditing: boolean) => {
+  const handleArrayInput = (field: 'color' | 'sizes' | 'patterns', value: string, isEditing: boolean) => {
     const values = value.split(',').map((v) => v.trim()).filter((v) => v);
     if (isEditing && editingProduct) {
       setEditingProduct({ ...editingProduct, [field]: values });
@@ -94,6 +122,82 @@ export default function ProductsManagement({
       setNewProduct({ ...newProduct, [field]: values });
     }
   };
+
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setSelectedCategory(value);
+  };
+
+  const handleDateFilterChange = (value: string) => {
+    setDateFilter(value);
+  };
+
+  useEffect(() => {
+    fetchCategories().then(setCategories).catch(err => {
+      console.error("Erreur lors du chargement des catégories:", err);
+      setError("Erreur lors du chargement des catégories");
+    });
+  }, []);
+
+  useEffect(() => {
+    setIsLoading(true);
+    try {
+      let filtered = products.filter(product => {
+        const matchesSearch = searchTerm === '' || 
+                             product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             product.description.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+        
+        // Filtre par date (ici on utilise createdAt comme exemple)
+        let matchesDate = true;
+        if (dateFilter !== 'all' && product.createdAt) {
+          const productDate = new Date(product.createdAt);
+          const today = new Date();
+          const diffTime = Math.abs(today.getTime() - productDate.getTime());
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          if (dateFilter === 'today' && diffDays > 1) matchesDate = false;
+          if (dateFilter === 'week' && diffDays > 7) matchesDate = false;
+          if (dateFilter === 'month' && diffDays > 30) matchesDate = false;
+        }
+        
+        return matchesSearch && matchesCategory && matchesDate;
+      });
+
+      // Tri
+      filtered.sort((a, b) => {
+        switch (sortBy) {
+          case 'price-low':
+            return (a.originalPrice || a.price) - (b.originalPrice || b.price);
+          case 'price-high':
+            return (b.originalPrice || b.price) - (a.originalPrice || a.price);
+          case 'rating':
+            return (b.rating || 0) - (a.rating || 0);
+          case 'newest':
+            return (b.new ? 1 : 0) - (a.new ? 1 : 0);
+          case 'date-added':
+            // Trier par date de création (les plus récents d'abord)
+            if (a.createdAt && b.createdAt) {
+              return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            }
+            return 0;
+          default:
+            return (b.reviews || 0) - (a.reviews || 0);
+        }
+      });
+
+      setFilteredProducts(filtered);
+      setError(null);
+    } catch (err) {
+      setError("Erreur lors du filtrage des produits");
+      console.error("Erreur de filtrage:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [products, searchTerm, selectedCategory, sortBy, dateFilter]);
 
   return (
     <div className="space-y-6">
@@ -107,6 +211,138 @@ export default function ProductsManagement({
         </button>
       </div>
 
+      {/* Filtres et recherche améliorés */}
+      <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+            {/* Recherche */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                type="text"
+                placeholder="Rechercher un produit..."
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)} 
+                className="pl-10"
+              />
+            </div>
+
+            {/* Bouton pour afficher/masquer les filtres */}
+            <Button 
+              variant="outline" 
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              Filtres
+            </Button>
+
+            {/* Mode d'affichage */}
+            <div className="flex items-center space-x-2">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+              >
+                <Grid3X3 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Filtres avancés (affichés conditionnellement) */}
+          {showFilters && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
+              {/* Catégorie */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Catégorie</label>
+                <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Toutes les catégories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes les catégories</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.name}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filtre par date */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Date d'ajout</label>
+                <Select value={dateFilter} onValueChange={handleDateFilterChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Toutes les dates" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes les dates</SelectItem>
+                    <SelectItem value="today">Aujourd'hui</SelectItem>
+                    <SelectItem value="week">Cette semaine</SelectItem>
+                    <SelectItem value="month">Ce mois</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Tri */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Trier par</label>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Trier par" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sortOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {!isLoading && (
+          <div className="mt-4 text-sm text-gray-600">
+            {filteredProducts.length} produit{filteredProducts.length > 1 ? 's' : ''} trouvé{filteredProducts.length > 1 ? 's' : ''}
+          </div>
+        )}
+      </div>
+
+      {/* Gestion des erreurs */}
+      {error && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-8">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700">{error}</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="mt-2 text-sm text-red-500 hover:text-red-700 font-medium"
+              >
+                Réessayer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tableau des produits */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -124,12 +360,15 @@ export default function ProductsManagement({
                 Statut
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Date d'ajout
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <tr key={product.id}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
@@ -153,14 +392,20 @@ export default function ProductsManagement({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {product.price}€
-                  {product.originalPrice > product.price  && (
+                  {product.originalPrice > product.price && (
                     <span className="ml-2 text-sm text-gray-500 line-through">{product.originalPrice}€</span>
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    {product.isOnSale ? 'En promo' : 'Standard'}
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    product.onSale ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                  }`}>
+                    {product.onSale ? 'En promo' : 'Standard'}
+                    {product.new && ' • Nouveau'}
                   </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {product.createdAt ? new Date(product.createdAt).toLocaleDateString('fr-FR') : 'N/A'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <button
@@ -261,7 +506,7 @@ export default function ProductsManagement({
                   <label className="block text-sm font-medium text-gray-700 mb-1">Couleurs (séparées par des virgules)</label>
                   <input
                     type="text"
-                    onChange={(e) => handleArrayInput('colors', e.target.value, false)}
+                    onChange={(e) => handleArrayInput('color', e.target.value, false)}
                     className="w-full border border-gray-300 rounded-md px-3 py-2"
                   />
                 </div>
@@ -285,8 +530,8 @@ export default function ProductsManagement({
                   <label className="flex items-center mt-4">
                     <input
                       type="checkbox"
-                      checked={newProduct.isNew}
-                      onChange={(e) => setNewProduct({ ...newProduct, isNew: e.target.checked })}
+                      checked={newProduct.new}
+                      onChange={(e) => setNewProduct({ ...newProduct, new: e.target.checked })}
                       className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
                     <span className="ml-2 text-sm text-gray-600">Nouveau produit</span>
@@ -296,8 +541,8 @@ export default function ProductsManagement({
                   <label className="flex items-center mt-4">
                     <input
                       type="checkbox"
-                      checked={newProduct.isOnSale}
-                      onChange={(e) => setNewProduct({ ...newProduct, isOnSale: e.target.checked })}
+                      checked={newProduct.onSale}
+                      onChange={(e) => setNewProduct({ ...newProduct, onSale: e.target.checked })}
                       className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
                     <span className="ml-2 text-sm text-gray-600">En promotion</span>
@@ -403,8 +648,8 @@ export default function ProductsManagement({
                   <label className="block text-sm font-medium text-gray-700 mb-1">Couleurs (séparées par des virgules)</label>
                   <input
                     type="text"
-                    value={editingProduct.colors?.join(', ') || ''}
-                    onChange={(e) => handleArrayInput('colors', e.target.value, true)}
+                    value={editingProduct.color?.join(', ') || ''}
+                    onChange={(e) => handleArrayInput('color', e.target.value, true)}
                     className="w-full border border-gray-300 rounded-md px-3 py-2"
                   />
                 </div>
@@ -430,8 +675,8 @@ export default function ProductsManagement({
                   <label className="flex items-center mt-4">
                     <input
                       type="checkbox"
-                      checked={editingProduct.isNew}
-                      onChange={(e) => setEditingProduct({ ...editingProduct, isNew: e.target.checked })}
+                      checked={editingProduct.new}
+                      onChange={(e) => setEditingProduct({ ...editingProduct, new: e.target.checked })}
                       className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
                     <span className="ml-2 text-sm text-gray-600">Nouveau produit</span>
@@ -441,8 +686,8 @@ export default function ProductsManagement({
                   <label className="flex items-center mt-4">
                     <input
                       type="checkbox"
-                      checked={editingProduct.isOnSale}
-                      onChange={(e) => setEditingProduct({ ...editingProduct, isOnSale: e.target.checked })}
+                      checked={editingProduct.onSale}
+                      onChange={(e) => setEditingProduct({ ...editingProduct, onSale: e.target.checked })}
                       className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
                     <span className="ml-2 text-sm text-gray-600">En promotion</span>

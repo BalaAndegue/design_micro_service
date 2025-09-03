@@ -9,9 +9,9 @@ export interface Product {
   imagePath: string;
   rating?: number;
   reviews?: number;
-  isNew?: boolean;
+  New?: boolean;
   isOnSale?: boolean;
-  colors?: string[];
+  color?: string[];
   sizes?: string[];
   patterns?: string[];
   createdAt?: string;

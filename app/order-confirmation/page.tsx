@@ -241,7 +241,7 @@ export default function OrderConfirmationPage() {
         <Card className="mt-8">
           <CardContent className="p-6 text-center">
             <h2 className="text-xl font-bold text-gray-900 mb-2">
-              Merci de faire confiance à CustomCraft !
+              Merci de faire confiance à CustomWorld !
             </h2>
             <p className="text-gray-600 mb-4">
               Votre commande sera traitée avec le plus grand soin. 

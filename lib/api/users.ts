@@ -1,5 +1,5 @@
 // lib/api/users.ts
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.43.11:8081/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://customworld.onrender.com/api';
 export interface User {
   id: number;
   name: string | null;
@@ -36,7 +36,7 @@ export const createUser = async (user: Omit<User, 'id' | 'createdAt'>): Promise<
 };
 
 export const updateUser = async (id: number, user: Partial<User>): Promise<User> => {
-  const response = await fetch(`/api/users/${id}`, {
+  const response = await fetch(`${API_URL}/admin/users/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(user),
@@ -46,7 +46,7 @@ export const updateUser = async (id: number, user: Partial<User>): Promise<User>
 };
 
 export const deleteUser = async (id: number): Promise<void> => {
-  const response = await fetch(`/api/users/${id}`, {
+  const response = await fetch(`${API_URL}/admin/users/${id}`, {
     method: 'DELETE',
   });
   if (!response.ok) throw new Error('Erreur lors de la suppression de l\'utilisateur');

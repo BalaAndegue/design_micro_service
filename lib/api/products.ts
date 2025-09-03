@@ -1,20 +1,19 @@
 // app/lib/api.ts
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.43.11:8081/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://customworld.onrender.com/api';
 
 export interface Product {
   id: number;
   name: string;
   description: string;
   category: string;
-  //basePrice: number;
   price: number;
   originalPrice: number;
   imagePath: string;
   rating?: number;
   reviews?: number;
-  isNew?: boolean;
-  isOnSale?: boolean;
-  colors?: string[];
+  new?: boolean;
+  onSale?: boolean;
+  color?: string[];
   sizes?: string[];
   patterns?: string[];
   createdAt?: string;
@@ -28,10 +27,33 @@ export interface Stats {
   newUsersThisMonth: number;
   totalUsers: number;
 }
-const user = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
-const userid = user ? JSON.parse(user).id : null;
-const userrole = user ?JSON.parse(user).role : null;
-//console.log('le user id est '+userid)
+
+export interface Category {
+  id: number;
+  name: string;
+}
+
+// Fonctions pour récupérer les informations utilisateur
+const getUserId = (): number | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user).id : null;
+  } catch {
+    return null;
+  }
+};
+
+const getUserRole = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user).role : null;
+  } catch {
+    return null;
+  }
+};
+
 const getAuthHeaders = () => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -39,9 +61,36 @@ const getAuthHeaders = () => {
   return headers;
 };
 
+// Fonction pour obtenir le préfixe d'API basé sur le rôle
+const getApiPrefix = (): string => {
+  const role = getUserRole();
+  switch (role) {
+    case 'ADMIN':
+      return 'admin';
+    case 'VENDOR':
+      return 'vendor';
+    case 'CUSTOMER':
+      return 'customer';
+    default:
+      return 'customer'; // Par défaut pour les utilisateurs non connectés
+  }
+};
+
+// Fonction utilitaire pour construire les URLs d'API
+const buildApiUrl = (endpoint: string): string => {
+  const prefix = getApiPrefix();
+  return `${API_URL}/${prefix}/${endpoint}`;
+};
+
+// Fonction utilitaire pour les endpoints publics (sans préfixe de rôle)
+const buildPublicApiUrl = (endpoint: string): string => {
+  return `${API_URL}/${endpoint}`;
+};
+
+// STATISTIQUES (uniquement pour ADMIN)
 export const fetchStats = async (): Promise<Stats> => {
   try {
-    const res = await fetch(`${API_URL}/admin/stats`, {
+    const res = await fetch(buildApiUrl('stats'), {
       method: 'GET',
       headers: getAuthHeaders(),
       cache: 'no-store',
@@ -54,15 +103,15 @@ export const fetchStats = async (): Promise<Stats> => {
   }
 };
 
+// PRODUITS
 export const fetchProducts = async (): Promise<Product[]> => {
   try {
-    const res = await fetch(`${API_URL}/admin/products`, {
+    const res = await fetch(buildApiUrl('products'), {
       method: 'GET',
       headers: getAuthHeaders(),
       cache: 'no-store',
     });
     if (!res.ok) throw new Error(`Failed to fetch products: ${res.status} ${res.statusText}`);
-    
     return res.json();
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -70,25 +119,29 @@ export const fetchProducts = async (): Promise<Product[]> => {
   }
 };
 
-
-export async function fetchProductById(id: string): Promise<Product> {
-  const response = await fetch(`${API_URL}/vendor/products/${id}`,{
-    method: 'GET',
-    headers: getAuthHeaders(),
-    cache: 'no-store',
-  });
-  if (!response.ok) {
-    throw new Error('Produit non trouvé');
+export const fetchProductById = async (id: string): Promise<Product> => {
+  try {
+    const response = await fetch(buildApiUrl(`products/${id}`), {
+      method: 'GET',
+      headers: getAuthHeaders(),
+      cache: 'no-store',
+    });
+    if (!response.ok) {
+      throw new Error('Produit non trouvé');
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching product by id:', error);
+    throw new Error('Unable to fetch product.');
   }
-  return response.json();
-}
+};
 
 export const createProduct = async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> => {
   try {
-    const res = await fetch(`${API_URL}/vendor/products`, {
+    const res = await fetch(buildApiUrl('products'), {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify(product,userid),
+      body: JSON.stringify(product),
     });
     if (!res.ok) throw new Error(`Failed to create product: ${res.status} ${res.statusText}`);
     return res.json();
@@ -98,22 +151,9 @@ export const createProduct = async (product: Omit<Product, 'id' | 'createdAt' | 
   }
 };
 
-export const patchProduct = async (
-  id: number, 
-  updates: Partial<Omit<Product, 'id' | 'createdAt' | 'updatedAt'>>
-): Promise<Product> => {
-  const response = await fetch(`/api/products/${id}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updates),
-  });
-  if (!response.ok) throw new Error('Erreur lors de la mise à jour partielle du produit');
-  return response.json();
-};
-
 export const updateProduct = async (id: number, product: Partial<Omit<Product, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Product> => {
   try {
-    const res = await fetch(`${API_URL}/vendor/products/${id}`, {
+    const res = await fetch(buildApiUrl(`products/${id}`), {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(product),
@@ -128,7 +168,7 @@ export const updateProduct = async (id: number, product: Partial<Omit<Product, '
 
 export const deleteProduct = async (id: number): Promise<void> => {
   try {
-    const res = await fetch(`${API_URL}/vendor/products/${id}`, {
+    const res = await fetch(buildApiUrl(`products/${id}`), {
       method: 'DELETE',
       headers: getAuthHeaders(),
     });
@@ -137,4 +177,90 @@ export const deleteProduct = async (id: number): Promise<void> => {
     console.error('Error deleting product:', error);
     throw new Error('Unable to delete product.');
   }
+};
+
+// CATÉGORIES (accessible à tous les rôles, donc on utilise l'endpoint public)
+export const fetchCategories = async (): Promise<Category[]> => {
+  try {
+    const res = await fetch(buildApiUrl('categories'), {
+      method: 'GET',
+      headers: getAuthHeaders(),
+      cache: 'no-store',
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to fetch categories: ${res.status} ${res.statusText}`);
+    }
+    return res.json();
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    throw new Error('Unable to fetch categories.');
+  }
+};
+
+// FONCTIONS SPÉCIFIQUES PAR RÔLE (exemples)
+
+// Fonctions spécifiques pour ADMIN
+export const adminFetchAllUsers = async (): Promise<any[]> => {
+  if (getUserRole() !== 'ADMIN') {
+    throw new Error('Access denied. Admin role required.');
+  }
+  try {
+    const res = await fetch(buildApiUrl('users'), {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error(`Failed to fetch users: ${res.status} ${res.statusText}`);
+    return res.json();
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw new Error('Unable to fetch users.');
+  }
+};
+
+// Fonctions spécifiques pour VENDOR
+export const vendorFetchMyProducts = async (): Promise<Product[]> => {
+  if (getUserRole() !== 'VENDOR') {
+    throw new Error('Access denied. Vendor role required.');
+  }
+  try {
+    const res = await fetch(buildApiUrl('my-products'), {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error(`Failed to fetch vendor products: ${res.status} ${res.statusText}`);
+    return res.json();
+  } catch (error) {
+    console.error('Error fetching vendor products:', error);
+    throw new Error('Unable to fetch vendor products.');
+  }
+};
+
+// Fonctions spécifiques pour CUSTOMER
+export const customerFetchOrders = async (): Promise<any[]> => {
+  if (getUserRole() !== 'CUSTOMER') {
+    throw new Error('Access denied. Customer role required.');
+  }
+  try {
+    const res = await fetch(buildApiUrl('orders'), {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error(`Failed to fetch orders: ${res.status} ${res.statusText}`);
+    return res.json();
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    throw new Error('Unable to fetch orders.');
+  }
+};
+
+// Fonction pour vérifier les permissions (utilitaire)
+export const hasRole = (requiredRole: string): boolean => {
+  const userRole = getUserRole();
+  return userRole === requiredRole;
+};
+
+// Fonction pour vérifier plusieurs rôles
+export const hasAnyRole = (requiredRoles: string[]): boolean => {
+  const userRole = getUserRole();
+  return requiredRoles.includes(userRole || '');
 };

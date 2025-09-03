@@ -633,7 +633,7 @@ import { Search, Grid3X3, List } from 'lucide-react';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { useCart } from '@/providers/cart-provider';
-import { fetchProducts ,Product} from '@/lib/api/products';
+import { fetchProducts ,Product, fetchCategories, Category} from '@/lib/api/products';
 import { ProductCard } from '@/components/products/ProductCard';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -669,6 +669,7 @@ export default function ProductsPage(
   );
   //const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('popular');
+  const [categories, setCategories] = useState<Category[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -696,6 +697,15 @@ export default function ProductsPage(
     if (value !== 'all') params.set('category', value);
     router.push(`/products?${params.toString()}`);
   };
+
+
+  useEffect(() => {
+      fetchCategories().then(setCategories).catch(err => {
+        console.error("Erreur lors du chargement des catégories:", err);
+        setError("Erreur lors du chargement des catégories");
+      });
+    }, []);
+  
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -733,7 +743,7 @@ export default function ProductsPage(
         case 'rating':
           return (b.rating || 0) - (a.rating || 0);
         case 'newest':
-          return (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0);
+          return (b.new ? 1 : 0) - (a.new ? 1 : 0);
         default:
           return (b.reviews || 0) - (a.reviews || 0);
       }
@@ -776,8 +786,8 @@ export default function ProductsPage(
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((category) => (
-                    <SelectItem key={category.value} value={category.value}>
-                      {category.label}
+                    <SelectItem key={category.id} value={category.name}>
+                      {category.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

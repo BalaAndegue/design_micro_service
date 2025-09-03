@@ -32,7 +32,7 @@ export default function LoginPage() {
 
     try {
       // Appel à l'API Spring Boot
-      const response = await fetch('http://192.168.43.11:8081/api/auth/login', {
+      const response = await fetch('https://customworld.onrender.com/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

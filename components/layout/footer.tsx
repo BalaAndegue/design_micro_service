@@ -1,8 +1,37 @@
 // components/Footer.tsx
 import React from "react";
-import { ShoppingBag } from "lucide-react"; // icône (si tu utilises lucide-react)
+import { 
+  ShoppingBag, 
+  Twitter, 
+  Facebook, 
+  Instagram, 
+  Linkedin 
+} from "lucide-react";
 
 export const Footer = () => {
+  const socialLinks = [
+    {
+      name: "twitter",
+      icon: <Twitter className="w-4 h-4" />,
+      url: "https://twitter.com/costumworld"
+    },
+    {
+      name: "facebook",
+      icon: <Facebook className="w-4 h-4" />,
+      url: "https://facebook.com/costumworld"
+    },
+    {
+      name: "instagram",
+      icon: <Instagram className="w-4 h-4" />,
+      url: "https://instagram.com/costumworld"
+    },
+    {
+      name: "linkedin",
+      icon: <Linkedin className="w-4 h-4" />,
+      url: "https://linkedin.com/company/costumworld"
+    }
+  ];
+
   return (
     <footer className="bg-gray-800 text-gray-300 py-12">
       <div className="container mx-auto px-4 md:px-6">
@@ -21,13 +50,16 @@ export const Footer = () => {
               Your one-stop shop for all the latest products and trends in 2025.
             </p>
             <div className="flex space-x-4">
-              {["twitter", "facebook", "instagram", "linkedin"].map((social) => (
+              {socialLinks.map((social) => (
                 <a
-                  key={social}
-                  href="#"
+                  key={social.name}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"
+                  aria-label={social.name}
                 >
-                  <span className="sr-only">{social}</span>
+                  {social.icon}
                 </a>
               ))}
             </div>

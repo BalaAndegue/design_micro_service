@@ -26,7 +26,7 @@ export function ProductCard({
               className="w-full h-48 object-cover rounded-t-lg"
             />
             <div className="absolute top-2 left-2 flex flex-col gap-1">
-              {product.isNew && <Badge className="bg-green-500">Nouveau</Badge>}
+              {product.New && <Badge className="bg-green-500">Nouveau</Badge>}
               {product.isOnSale && <Badge className="bg-red-500">Promo</Badge>}
             </div>
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 rounded-t-lg" />

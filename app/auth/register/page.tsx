@@ -62,7 +62,7 @@ export default function RegisterPage() {
     };
 
     try {
-      const response = await fetch('http://192.168.1.109:8080/api/auth/register', {
+      const response = await fetch('https://customworld.onrender.com/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ export default function RegisterPage() {
             <span>Retour à l'accueil</span>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900">Inscription</h1>
-          <p className="text-gray-600 mt-2">Créez votre compte CustomCraft</p>
+          <p className="text-gray-600 mt-2">Créez votre compte CustomWorld</p>
         </div>
 
         <Card className="shadow-lg">

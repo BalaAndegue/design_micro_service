@@ -134,7 +134,7 @@ export function ProductList() {
                 <TableRow key={product.id}>
                   <TableCell>
                     <img 
-                      src={product.imageUrl} 
+                      src={product.imagePath} 
                       alt={product.name} 
                       className="h-12 w-12 object-cover rounded"
                     />
@@ -153,7 +153,7 @@ export function ProductList() {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      {product.isNew && (
+                      {product.New && (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                           Nouveau
                         </span>
