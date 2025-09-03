@@ -83,8 +83,8 @@ const buildApiUrl = (endpoint: string): string => {
 };
 
 // Fonction utilitaire pour les endpoints publics (sans préfixe de rôle)
-const buildPublicApiUrl = (endpoint: string): string => {
-  return `${API_URL}/${endpoint}`;
+const buildPublicApiUrl = (prefix:string,endpoint: string): string => {
+  return `${API_URL}/${prefix}/${endpoint}`;
 };
 
 // STATISTIQUES (uniquement pour ADMIN)
@@ -138,7 +138,7 @@ export const fetchProductById = async (id: string): Promise<Product> => {
 
 export const createProduct = async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> => {
   try {
-    const res = await fetch(buildApiUrl('products'), {
+    const res = await fetch(buildPublicApiUrl('vendor','products'), {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(product),
@@ -168,7 +168,7 @@ export const updateProduct = async (id: number, product: Partial<Omit<Product, '
 
 export const deleteProduct = async (id: number): Promise<void> => {
   try {
-    const res = await fetch(buildApiUrl(`products/${id}`), {
+    const res = await fetch(buildPublicApiUrl('vendor',`products/${id}`), {
       method: 'DELETE',
       headers: getAuthHeaders(),
     });
@@ -182,7 +182,7 @@ export const deleteProduct = async (id: number): Promise<void> => {
 // CATÉGORIES (accessible à tous les rôles, donc on utilise l'endpoint public)
 export const fetchCategories = async (): Promise<Category[]> => {
   try {
-    const res = await fetch(buildApiUrl('categories'), {
+    const res = await fetch(buildPublicApiUrl('customer','categories'), {
       method: 'GET',
       headers: getAuthHeaders(),
       cache: 'no-store',
