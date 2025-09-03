@@ -1,4 +1,3 @@
-
 'use client';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -7,13 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Eye, EyeOff, Mail, Lock, ArrowLeft } from 'lucide-react';
-import { useAuth } from '@/providers/auth-provider';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 export default function LoginPage() {
-  const { login, isLoading } = useAuth();
   const router = useRouter();
   
   const [formData, setFormData] = useState({
@@ -21,12 +19,15 @@ export default function LoginPage() {
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
     if (!formData.email || !formData.password) {
       toast.error('Veuillez remplir tous les champs');
+      setIsLoading(false);
       return;
     }
 
@@ -37,7 +38,7 @@ export default function LoginPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials:"include",
+        credentials: "include",
         body: JSON.stringify({
           email: formData.email,
           password: formData.password
@@ -48,7 +49,7 @@ export default function LoginPage() {
       console.log('les donnees recus '+data)
 
       if (response.ok) {
-        //on recupere le role de celui qui s'est connecter
+        // on recupere le role de celui qui s'est connecter
         const userRole = data.user.role;
         // Stockage du token JWT et des informations utilisateur
         localStorage.setItem('token', data.accessToken);
@@ -57,38 +58,50 @@ export default function LoginPage() {
         toast.success('Connexion réussie !');
         if (userRole === 'ADMIN') {
           router.push('/admin');
-          //window.location.reload();
           return;
         } else if (userRole === 'VENDOR') {
           router.push('/vendor');
-          //window.location.reload();
           return;
         }
 
         router.push('/');
-        //window.location.reload();
       } else {
         toast.error(data.message || 'Email ou mot de passe incorrect');
       }
     } catch (error) {
       console.error('Erreur de connexion:', error);
       toast.error('Erreur de connexion au serveur');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen relative flex items-center justify-center p-4">
+      {/* Image de background */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/assets/image.jpg" // Chemin depuis le dossier public
+          alt="Background"
+          fill
+          className="object-cover"
+          priority
+        />
+        {/* Overlay pour améliorer la lisibilité */}
+        <div className="absolute inset-0 bg-black/30"></div>
+      </div>
+
+      <div className="w-full max-w-md relative z-10">
         <div className="mb-8 text-center">
-          <Link href="/" className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700 mb-4">
+          <Link href="/" className="inline-flex items-center space-x-2 text-white hover:text-blue-200 mb-4">
             <ArrowLeft className="h-4 w-4" />
             <span>Retour à l'accueil</span>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Connexion</h1>
-          <p className="text-gray-600 mt-2">Accédez à votre compte CustomWorld</p>
+          <h1 className="text-3xl font-bold text-white">Connexion</h1>
+          <p className="text-gray-200 mt-2">Accédez à votre compte CustomWorld</p>
         </div>
 
-        <Card className="shadow-lg">
+        <Card className="shadow-lg bg-white/95 backdrop-blur-sm">
           <CardHeader>
             <CardTitle>Se connecter</CardTitle>
           </CardHeader>
@@ -166,4 +179,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-} 
+}

@@ -1,11 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  //output: 'export',
+  output: 'standalone',
   optimizeFonts: false,
   eslint: {
     ignoreDuringBuilds: true,
   },
-  images: { unoptimized: true },
+  images: { 
+    unoptimized: true ,
+    domains: ['images.pexels.com', 'i.pinimg.com', 'customworld.onrender.com'],
+
+  },
   async redirects() {
     return [
       {
