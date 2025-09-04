@@ -100,7 +100,7 @@ export default function CartPage() {
                 <CardContent className="p-6">
                   <div className="flex gap-4">
                     <img
-                      src={item.image}
+                      src={item.imagePath}
                       alt={item.productName}
                       className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
                     />
