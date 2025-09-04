@@ -424,14 +424,20 @@ export default function CheckoutPage() {
                 {items.map((item) => (
                   <div key={item.id} className="flex gap-3">
                     <img
-                      src={item.image}
-                      alt={item.name}
+                      src={item.imagePath}
+                      alt={item.imagePath}
                       className="w-16 h-16 object-cover rounded-lg"
                     />
                     <div className="flex-1">
-                      <h4 className="font-medium text-sm">{item.name}</h4>
+                      <h4 className="font-medium text-sm">{item.imagePath}</h4>
                       <div className="flex flex-wrap gap-1 mt-1">
-                        {Object.entries(item.customizations).map(([key, value]) => 
+
+
+
+                       
+
+                        {item.customizations && 
+                        Object.entries(item.customizations).map(([key, value]) => 
                           value && (
                             <Badge key={key} variant="secondary" className="text-xs">
                               {value}
