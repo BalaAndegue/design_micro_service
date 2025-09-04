@@ -1,7 +1,8 @@
 // lib/types/cart.ts
 export interface CartItem {
+  id:number;
   productId: number;
-  name: string;
+  productName: string;
   price: number;
   quantity: number;
   image: string;
@@ -13,6 +14,14 @@ export interface CartItem {
     customImage?: boolean;
   };
 }
+
+export interface CartItems {
+  productId: number;
+  
+  quantity: number;
+ 
+}
+
 
 export interface Cart {
   id?: number;

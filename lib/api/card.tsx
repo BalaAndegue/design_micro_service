@@ -1,7 +1,7 @@
 // lib/api/cart.ts
 import { Cart, CartItem } from "../types/cart";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://10.2.7.207:8081/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://customworld.onrender.com/api';
 
 const getAuthHeaders = () => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -13,7 +13,7 @@ const getAuthHeaders = () => {
 // Récupérer le panier de l'utilisateur
 export const fetchCart = async (): Promise<Cart> => {
   try {
-    const res = await fetch(`${API_URL}/cart`, {
+    const res = await fetch(`${API_URL}/customer/cart`, {
       method: 'GET',
       headers: getAuthHeaders(),
       cache: 'no-store',
@@ -27,28 +27,37 @@ export const fetchCart = async (): Promise<Cart> => {
 };
 
 // Ajouter un article au panier
-export const addToCart = async (item: CartItem): Promise<Cart> => {
+export const addToCart = async (productId: number, quantity: number): Promise<Cart> => {
   try {
-    const res = await fetch(`${API_URL}/cart/items`, {
+    // 1. Construire l'URL avec les paramètres de requête
+    const url = `${API_URL}/customer/cart/add?productId=${productId}&quantity=${quantity}`;
+
+    // 2. Faire la requête POST avec une URL modifiée
+    const res = await fetch(url, {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify(item),
     });
-    if (!res.ok) throw new Error(`Failed to add item to cart: ${res.status} ${res.statusText}`);
+
+    if (!res.ok) {
+      throw new Error(`Failed to add item to cart: ${res.status} ${res.statusText}`);
+    }
+
+    // 3. Retourner la réponse du panier mis à jour
     return res.json();
+
   } catch (error) {
     console.error('Error adding item to cart:', error);
     throw new Error('Unable to add item to cart.');
   }
 };
+// Mettre à jour la quantité d'un article     `${API_URL}/customer/cart/update/${cartItemId}?quantity=${newQuantity}
 
-// Mettre à jour la quantité d'un article
-export const updateCartItem = async (productId: number, quantity: number): Promise<Cart> => {
+export const updateCartItem = async (cartItemId: number, quantity: number): Promise<Cart> => {
   try {
-    const res = await fetch(`${API_URL}/cart/items/${productId}`, {
+    const res = await fetch( `${API_URL}/customer/cart/update/${cartItemId}?quantity=${quantity}`, {
       method: 'PUT',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ quantity }),
+      //body: JSON.stringify({ quantity }),
     });
     if (!res.ok) throw new Error(`Failed to update cart item: ${res.status} ${res.statusText}`);
     return res.json();
@@ -61,7 +70,7 @@ export const updateCartItem = async (productId: number, quantity: number): Promi
 // Supprimer un article du panier
 export const removeFromCart = async (productId: number): Promise<Cart> => {
   try {
-    const res = await fetch(`${API_URL}/cart/items/${productId}`, {
+    const res = await fetch(`${API_URL}/customer/cart/remove/${productId}`, {
       method: 'DELETE',
       headers: getAuthHeaders(),
     });

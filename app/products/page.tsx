@@ -877,7 +877,7 @@ export default function ProductsPage(
                 key={product.id} 
                 product={product} 
                 viewMode={viewMode}
-                onAddToCart={addItem}
+                
               />
             ))
           )}

@@ -4,34 +4,60 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
-import { CartItem } from '@/providers/cart-provider';
+import { useCart } from '@/providers/cart-provider';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 export function ProductCard({
   product,
-  viewMode,
-  onAddToCart
+  viewMode
 }: {
   product: Product;
   viewMode: 'grid' | 'list';
-  onAddToCart: (item: Omit<CartItem, 'id'>) => void;
 }) {
+  const [isAdding, setIsAdding] = useState(false);
+  const { addItem } = useCart();
+
+  const handleAddToCart = async () => {
+    try {
+      setIsAdding(true);
+      
+      await addItem({
+        id: product.id,
+        productId: product.id,
+        productName: product.name,
+        price: product.price, // Utilisez product.price au lieu de product.originalPrice
+        quantity: 1,
+        image: product.imagePath,
+        customizations: {}
+      });
+      
+      toast.success('Produit ajouté au panier !');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast.error('Erreur lors de l\'ajout au panier');
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300">
+    <Card className="group hover:shadow-lg transition-all duration-300 h-full flex flex-col">
       {viewMode === 'grid' ? (
         <>
-          <div className="relative">
+          <div className="relative flex-shrink-0">
             <img
               src={product.imagePath}
               alt={product.name}
               className="w-full h-48 object-cover rounded-t-lg"
             />
             <div className="absolute top-2 left-2 flex flex-col gap-1">
-              {product.New && <Badge className="bg-green-500">Nouveau</Badge>}
-              {product.isOnSale && <Badge className="bg-red-500">Promo</Badge>}
+              {product.new && <Badge className="bg-green-500">Nouveau</Badge>}
+              {product.onSale && <Badge className="bg-red-500">Promo</Badge>}
             </div>
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 rounded-t-lg" />
           </div>
-          <CardContent className="p-4">
+          <CardContent className="p-4 flex flex-col flex-grow">
             <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{product.name}</h3>
             <div className="flex items-center mb-2">
               {[...Array(5)].map((_, i) => (
@@ -44,13 +70,13 @@ export function ProductCard({
             </div>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
-                <span className="text-lg font-bold text-blue-600">€{product.originalPrice}</span>
-                {product.originalPrice && (
+                <span className="text-lg font-bold text-blue-600">€{product.price}</span>
+                {product.originalPrice && product.originalPrice > product.price  && (
                   <span className="text-sm text-gray-500 line-through">€{product.originalPrice}</span>
                 )}
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 mt-auto">
               <Link href={`/products/configurator/${product.id}`} className="flex-1">
                 <Button className="w-full bg-gradient-to-r from-blue-600 to-blue-700">
                   Personnaliser
@@ -59,16 +85,11 @@ export function ProductCard({
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => onAddToCart(
-                    { productId: product.id, 
-                        name: product.name, 
-                        price: product.originalPrice || 0, 
-                        quantity: 1,
-                        image: product.imagePath,
-                        customizations: {}
-                })}
+                onClick={handleAddToCart}
+                disabled={isAdding}
               >
                 <ShoppingCart className="h-4 w-4" />
+                {isAdding ? '...' : ''}
               </Button>
             </div>
           </CardContent>
@@ -97,8 +118,8 @@ export function ProductCard({
                 </div>
                 <div className="text-right">
                   <div className="flex items-center space-x-2 mb-2">
-                    <span className="text-lg font-bold text-blue-600">€{product.originalPrice}</span>
-                    {product.originalPrice && (
+                    <span className="text-lg font-bold text-blue-600">€{product.price}</span>
+                    {product.originalPrice && product.originalPrice > product.price && (
                       <span className="text-sm text-gray-500 line-through">€{product.originalPrice}</span>
                     )}
                   </div>
@@ -111,15 +132,11 @@ export function ProductCard({
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => onAddToCart({ productId: product.id, 
-                        name: product.name, 
-                        price: product.originalPrice || 0, 
-                        quantity: 1,
-                        image: product.imagePath,
-                        customizations: {}
-                })}
+                      onClick={handleAddToCart}
+                      disabled={isAdding}
                     >
                       <ShoppingCart className="h-4 w-4" />
+                      {isAdding ? '...' : ''}
                     </Button>
                   </div>
                 </div>

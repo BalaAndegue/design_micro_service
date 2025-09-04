@@ -4,13 +4,13 @@ export interface Product {
   description: string;
   category: string;
   
-  price?: number;
+  price: number;
   originalPrice?: number;
   imagePath: string;
   rating?: number;
   reviews?: number;
-  New?: boolean;
-  isOnSale?: boolean;
+  new?: boolean;
+  onSale?: boolean;
   color?: string[];
   sizes?: string[];
   patterns?: string[];

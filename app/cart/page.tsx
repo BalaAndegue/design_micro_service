@@ -23,7 +23,7 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, totalPrice, totalItems, clearCart } = useCart();
+  const { items, removeItem, updateItemQuantity, totalPrice, totalItems, clearCart } = useCart();
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [isCheckingPromo, setIsCheckingPromo] = useState(false);
@@ -101,12 +101,12 @@ export default function CartPage() {
                   <div className="flex gap-4">
                     <img
                       src={item.image}
-                      alt={item.name}
+                      alt={item.productName}
                       className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
                     />
                     <div className="flex-1">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold text-gray-900">{item.name}</h3>
+                        <h3 className="font-semibold text-gray-900">{item.productName}</h3>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -119,17 +119,21 @@ export default function CartPage() {
                       
                       {/* Personnalisations */}
                       <div className="flex flex-wrap gap-2 mb-3">
-                        {item.customizations.color && (
-                          <Badge variant="secondary">Couleur: {item.customizations.color}</Badge>
-                        )}
-                        {item.customizations.pattern && (
-                          <Badge variant="secondary">Motif: {item.customizations.pattern}</Badge>
-                        )}
-                        {item.customizations.size && (
-                          <Badge variant="secondary">Taille: {item.customizations.size}</Badge>
-                        )}
-                        {item.customizations.text && (
-                          <Badge variant="secondary">Texte: "{item.customizations.text}"</Badge>
+                        {item.customizations && (
+                          <>
+                            {item.customizations.color && (
+                              <Badge variant="secondary">Couleur: {item.customizations.color}</Badge>
+                            )}
+                            {item.customizations.pattern && (
+                              <Badge variant="secondary">Motif: {item.customizations.pattern}</Badge>
+                            )}
+                            {item.customizations.size && (
+                              <Badge variant="secondary">Taille: {item.customizations.size}</Badge>
+                            )}
+                            {item.customizations.text && (
+                              <Badge variant="secondary">Texte: "{item.customizations.text}"</Badge>
+                            )}
+                          </>
                         )}
                       </div>
 
@@ -138,7 +142,7 @@ export default function CartPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
                           >
                             <Minus className="h-3 w-3" />
                           </Button>
@@ -146,7 +150,7 @@ export default function CartPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
