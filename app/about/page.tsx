@@ -24,6 +24,7 @@ export default function AboutPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [activeTab, setActiveTab] = useState('mission');
+  const [isVisible, setIsVisible] = useState(false);
 
   const adminWhatsApp = '+237656616751';
   const adminEmail = 'admin@customworld.com';
@@ -31,7 +32,17 @@ export default function AboutPage() {
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    // Animation on scroll
+    const handleScrollVisibility = () => {
+      setIsVisible(window.scrollY > 100);
+    };
+    
+    window.addEventListener('scroll', handleScrollVisibility);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', handleScrollVisibility);
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -156,7 +167,7 @@ export default function AboutPage() {
         {/* Background animé */}
         <div className="absolute inset-0 bg-gradient-to-br from-violet-900 via-blue-900 to-indigo-900">
           <div 
-            className="absolute inset-0 opacity-20"
+            className="absolute inset-0 opacity-20 transition-transform duration-300"
             style={{
               backgroundImage: `radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%), 
                                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
@@ -186,34 +197,34 @@ export default function AboutPage() {
         <div className="relative z-10 container mx-auto px-4 text-center text-white">
           <div className="max-w-5xl mx-auto">
             <div className="animate-fade-in-up">
-              <h1 className="text-6xl md:text-8xl font-black mb-6 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent leading-tight">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-6 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent leading-tight">
                 CustomWorld
               </h1>
               <div className="flex items-center justify-center mb-8 space-x-4">
-                <div className="h-1 w-20 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-pulse" />
-                <Sparkles className="h-8 w-8 text-yellow-400 animate-spin-slow" />
-                <div className="h-1 w-20 bg-gradient-to-l from-purple-400 to-pink-400 rounded-full animate-pulse" />
+                <div className="h-1 w-10 sm:w-20 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-pulse" />
+                <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-400 animate-spin-slow" />
+                <div className="h-1 w-10 sm:w-20 bg-gradient-to-l from-purple-400 to-pink-400 rounded-full animate-pulse" />
               </div>
-              <p className="text-2xl md:text-3xl mb-8 font-light opacity-90">
+              <p className="text-xl sm:text-2xl md:text-3xl mb-8 font-light opacity-90">
                 L'art de la personnalisation à portée de main
               </p>
-              <p className="text-lg md:text-xl mb-12 max-w-3xl mx-auto opacity-80">
+              <p className="text-base sm:text-lg md:text-xl mb-12 max-w-3xl mx-auto opacity-80">
                 Transformez vos idées en créations uniques avec notre technologie de pointe et notre savoir-faire artisanal
               </p>
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center animate-fade-in-up animation-delay-300">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center animate-fade-in-up animation-delay-300">
               <Button 
                 size="lg" 
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl group"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold text-base sm:text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl group"
               >
                 Découvrir nos services
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button 
                 variant="outline" 
                 size="lg"
-                className="border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-full font-semibold text-lg backdrop-blur-sm transition-all duration-300"
+                className="border-white/30 text-white hover:bg-white/10 px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold text-base sm:text-lg backdrop-blur-sm transition-all duration-300"
               >
                 Voir notre portfolio
               </Button>
@@ -230,25 +241,25 @@ export default function AboutPage() {
       </section>
 
       {/* Section Stats avec animation au scroll */}
-      <section className="py-20 relative">
+      <section className="py-16 sm:py-20 relative">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
             {achievements.map((stat, index) => (
               <div 
                 key={index}
                 className="text-center group animate-fade-in-up"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-white/20">
-                  <div className="flex justify-center mb-4">
-                    <div className="bg-gradient-to-br from-blue-500 to-purple-500 p-4 rounded-2xl text-white transform group-hover:rotate-12 transition-transform duration-300">
+                <div className="bg-white/70 backdrop-blur-sm rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 sm:hover:-translate-y-2 border border-white/20">
+                  <div className="flex justify-center mb-2 sm:mb-4">
+                    <div className="bg-gradient-to-br from-blue-500 to-purple-500 p-2 sm:p-3 lg:p-4 rounded-xl sm:rounded-2xl text-white transform group-hover:rotate-12 transition-transform duration-300">
                       {stat.icon}
                     </div>
                   </div>
-                  <div className="text-4xl font-black text-gray-900 mb-2 group-hover:scale-110 transition-transform">
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 mb-1 sm:mb-2 group-hover:scale-110 transition-transform">
                     {stat.number}
                   </div>
-                  <div className="text-gray-600 font-medium">{stat.label}</div>
+                  <div className="text-xs sm:text-sm text-gray-600 font-medium">{stat.label}</div>
                 </div>
               </div>
             ))}
@@ -257,25 +268,25 @@ export default function AboutPage() {
       </section>
 
       {/* Section Mission avec onglets interactifs */}
-      <section className="py-20 bg-white/50 backdrop-blur-sm">
+      <section className="py-16 sm:py-20 bg-white/50 backdrop-blur-sm">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16 animate-fade-in-up">
-              <h2 className="text-5xl font-black text-gray-900 mb-6">
+            <div className="text-center mb-12 sm:mb-16 animate-fade-in-up">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-4 sm:mb-6">
                 Notre <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Mission</span>
               </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
                 Révolutionner le monde de la personnalisation en combinant créativité, technologie et excellence artisanale
               </p>
             </div>
 
             {/* Onglets */}
-            <div className="flex flex-wrap justify-center mb-12 bg-white/80 backdrop-blur-sm rounded-2xl p-2 shadow-xl">
+            <div className="flex flex-wrap justify-center mb-8 sm:mb-12 bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1 sm:p-2 shadow-xl">
               {['mission', 'vision', 'valeurs'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-8 py-4 rounded-xl font-semibold transition-all duration-300 ${
+                  className={`px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-lg sm:rounded-xl font-semibold transition-all duration-300 text-sm sm:text-base ${
                     activeTab === tab
                       ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transform scale-105'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
@@ -289,31 +300,31 @@ export default function AboutPage() {
             </div>
 
             {/* Contenu des onglets */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-2xl">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 shadow-xl sm:shadow-2xl">
               {activeTab === 'mission' && (
                 <div className="animate-fade-in text-center">
-                  <Target className="h-20 w-20 mx-auto mb-8 text-blue-600" />
-                  <h3 className="text-3xl font-bold mb-6">Créer l'Extraordinaire</h3>
-                  <p className="text-lg text-gray-600 mb-8 max-w-4xl mx-auto">
+                  <Target className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 mx-auto mb-4 sm:mb-6 md:mb-8 text-blue-600" />
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6">Créer l'Extraordinaire</h3>
+                  <p className="text-sm sm:text-base md:text-lg text-gray-600 mb-6 sm:mb-8 max-w-4xl mx-auto">
                     Nous nous engageons à transformer chaque idée en une création unique et mémorable. 
                     Notre mission est de démocratiser la personnalisation haut de gamme en alliant 
                     innovation technologique et savoir-faire artisanal traditionnel.
                   </p>
-                  <div className="grid md:grid-cols-3 gap-6 mt-12">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-12">
                     <div className="text-center">
-                      <Zap className="h-12 w-12 mx-auto mb-4 text-yellow-500" />
-                      <h4 className="font-bold mb-2">Innovation</h4>
-                      <p className="text-sm text-gray-600">Technologies de pointe</p>
+                      <Zap className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 mx-auto mb-2 sm:mb-4 text-yellow-500" />
+                      <h4 className="font-bold mb-1 sm:mb-2 text-sm sm:text-base">Innovation</h4>
+                      <p className="text-xs sm:text-sm text-gray-600">Technologies de pointe</p>
                     </div>
                     <div className="text-center">
-                      <Award className="h-12 w-12 mx-auto mb-4 text-green-500" />
-                      <h4 className="font-bold mb-2">Excellence</h4>
-                      <p className="text-sm text-gray-600">Qualité irréprochable</p>
+                      <Award className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 mx-auto mb-2 sm:mb-4 text-green-500" />
+                      <h4 className="font-bold mb-1 sm:mb-2 text-sm sm:text-base">Excellence</h4>
+                      <p className="text-xs sm:text-sm text-gray-600">Qualité irréprochable</p>
                     </div>
                     <div className="text-center">
-                      <Heart className="h-12 w-12 mx-auto mb-4 text-red-500" />
-                      <h4 className="font-bold mb-2">Passion</h4>
-                      <p className="text-sm text-gray-600">Amour du détail</p>
+                      <Heart className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 mx-auto mb-2 sm:mb-4 text-red-500" />
+                      <h4 className="font-bold mb-1 sm:mb-2 text-sm sm:text-base">Passion</h4>
+                      <p className="text-xs sm:text-sm text-gray-600">Amour du détail</p>
                     </div>
                   </div>
                 </div>
@@ -321,23 +332,23 @@ export default function AboutPage() {
 
               {activeTab === 'vision' && (
                 <div className="animate-fade-in text-center">
-                  <Globe className="h-20 w-20 mx-auto mb-8 text-purple-600" />
-                  <h3 className="text-3xl font-bold mb-6">Vision d'Avenir</h3>
-                  <p className="text-lg text-gray-600 mb-8 max-w-4xl mx-auto">
+                  <Globe className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 mx-auto mb-4 sm:mb-6 md:mb-8 text-purple-600" />
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6">Vision d'Avenir</h3>
+                  <p className="text-sm sm:text-base md:text-lg text-gray-600 mb-6 sm:mb-8 max-w-4xl mx-auto">
                     Devenir la référence africaine en matière de personnalisation premium, 
                     en inspirant une nouvelle génération de créateurs et en révolutionnant 
                     l'expérience client grâce à l'innovation continue.
                   </p>
-                  <div className="grid md:grid-cols-2 gap-8 mt-12">
-                    <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-2xl">
-                      <TrendingUp className="h-12 w-12 mb-4 text-blue-600" />
-                      <h4 className="font-bold mb-2">Croissance Durable</h4>
-                      <p className="text-sm text-gray-600">Expansion responsable en Afrique</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-8 sm:mt-12">
+                    <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-4 sm:p-6 rounded-xl sm:rounded-2xl">
+                      <TrendingUp className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 mb-2 sm:mb-4 text-blue-600" />
+                      <h4 className="font-bold mb-1 sm:mb-2 text-sm sm:text-base">Croissance Durable</h4>
+                      <p className="text-xs sm:text-sm text-gray-600">Expansion responsable en Afrique</p>
                     </div>
-                    <div className="bg-gradient-to-br from-green-50 to-blue-50 p-6 rounded-2xl">
-                      <Sparkles className="h-12 w-12 mb-4 text-green-600" />
-                      <h4 className="font-bold mb-2">Innovation Continue</h4>
-                      <p className="text-sm text-gray-600">Recherche et développement constant</p>
+                    <div className="bg-gradient-to-br from-green-50 to-blue-50 p-4 sm:p-6 rounded-xl sm:rounded-2xl">
+                      <Sparkles className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 mb-2 sm:mb-4 text-green-600" />
+                      <h4 className="font-bold mb-1 sm:mb-2 text-sm sm:text-base">Innovation Continue</h4>
+                      <p className="text-xs sm:text-sm text-gray-600">Recherche et développement constant</p>
                     </div>
                   </div>
                 </div>
@@ -345,23 +356,23 @@ export default function AboutPage() {
 
               {activeTab === 'valeurs' && (
                 <div className="animate-fade-in">
-                  <div className="text-center mb-12">
-                    <Heart className="h-20 w-20 mx-auto mb-8 text-red-600" />
-                    <h3 className="text-3xl font-bold mb-6">Nos Valeurs Fondamentales</h3>
+                  <div className="text-center mb-8 sm:mb-12">
+                    <Heart className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 mx-auto mb-4 sm:mb-6 md:mb-8 text-red-600" />
+                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6">Nos Valeurs Fondamentales</h3>
                   </div>
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     {values.map((value, index) => (
                       <div 
                         key={index}
-                        className="bg-gradient-to-br from-white to-gray-50 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                        className="bg-gradient-to-br from-white to-gray-50 p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                       >
-                        <div className="flex items-start space-x-4">
-                          <div className="bg-gradient-to-br from-blue-500 to-purple-500 p-3 rounded-xl text-white flex-shrink-0">
+                        <div className="flex items-start space-x-3 sm:space-x-4">
+                          <div className="bg-gradient-to-br from-blue-500 to-purple-500 p-2 sm:p-3 rounded-lg sm:rounded-xl text-white flex-shrink-0">
                             {value.icon}
                           </div>
                           <div>
-                            <h4 className="font-bold text-lg mb-2">{value.title}</h4>
-                            <p className="text-gray-600">{value.description}</p>
+                            <h4 className="font-bold text-base sm:text-lg mb-1 sm:mb-2">{value.title}</h4>
+                            <p className="text-gray-600 text-xs sm:text-sm">{value.description}</p>
                           </div>
                         </div>
                       </div>
@@ -375,37 +386,37 @@ export default function AboutPage() {
       </section>
 
       {/* Section Caractéristiques avec animations */}
-      <section className="py-20 relative overflow-hidden">
+      <section className="py-16 sm:py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900" />
         <div className="absolute inset-0 bg-black/40" />
         
         <div className="relative z-10 container mx-auto px-4">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-5xl font-black text-white mb-6">
+          <div className="text-center mb-12 sm:mb-16 animate-fade-in-up">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 sm:mb-6">
               Pourquoi Nous <span className="bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">Choisir</span> ?
             </h2>
-            <p className="text-xl text-white/80 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-white/80 max-w-3xl mx-auto">
               Une expérience unique qui dépasse toutes les attentes
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
             {features.map((feature, index) => (
               <div 
                 key={index}
                 className="group animate-fade-in-up"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
-                <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 h-full hover:bg-white/20 transition-all duration-500 transform hover:-translate-y-4 hover:shadow-2xl">
-                  <div className={`bg-gradient-to-r ${feature.color} p-4 rounded-2xl inline-block mb-6 group-hover:rotate-12 transition-transform duration-300`}>
+                <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 md:p-8 h-full hover:bg-white/20 transition-all duration-500 transform hover:-translate-y-2 sm:hover:-translate-y-4 hover:shadow-xl sm:hover:shadow-2xl">
+                  <div className={`bg-gradient-to-r ${feature.color} p-2 sm:p-3 md:p-4 rounded-xl sm:rounded-2xl inline-block mb-4 sm:mb-6 group-hover:rotate-12 transition-transform duration-300`}>
                     <div className="text-white">
                       {feature.icon}
                     </div>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-4 group-hover:text-yellow-300 transition-colors">
+                  <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-4 group-hover:text-yellow-300 transition-colors">
                     {feature.title}
                   </h3>
-                  <p className="text-white/70 group-hover:text-white/90 transition-colors">
+                  <p className="text-white/70 group-hover:text-white/90 transition-colors text-sm sm:text-base">
                     {feature.description}
                   </p>
                 </div>
@@ -416,28 +427,28 @@ export default function AboutPage() {
       </section>
 
       {/* Timeline Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
+      <section className="py-16 sm:py-20 bg-gradient-to-br from-gray-50 to-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-5xl font-black text-gray-900 mb-6">
+          <div className="text-center mb-12 sm:mb-16 animate-fade-in-up">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-4 sm:mb-6">
               Notre <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Histoire</span>
             </h2>
-            <p className="text-xl text-gray-600">Un parcours d'innovation et de croissance</p>
+            <p className="text-lg sm:text-xl text-gray-600">Un parcours d'innovation et de croissance</p>
           </div>
 
           <div className="max-w-4xl mx-auto">
             {timeline.map((item, index) => (
               <div 
                 key={index}
-                className="flex items-center mb-12 last:mb-0 animate-fade-in-up"
+                className="flex flex-col sm:flex-row items-start sm:items-center mb-8 sm:mb-12 last:mb-0 animate-fade-in-up"
                 style={{ animationDelay: `${index * 200}ms` }}
               >
-                <div className="flex-shrink-0 w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-xl">
+                <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-base sm:text-lg md:text-xl shadow-xl mb-4 sm:mb-0">
                   {item.year}
                 </div>
-                <div className="ml-8 bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
-                  <p className="text-gray-600">{item.description}</p>
+                <div className="sm:ml-6 md:ml-8 bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 flex-1">
+                  <h3 className="text-lg sm:text-xl md:text-xl font-bold text-gray-900 mb-1 sm:mb-2">{item.title}</h3>
+                  <p className="text-gray-600 text-sm sm:text-base">{item.description}</p>
                 </div>
               </div>
             ))}
@@ -446,83 +457,83 @@ export default function AboutPage() {
       </section>
 
       {/* Section Contact améliorée */}
-      <section className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+      <section className="py-16 sm:py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/30" />
         
         <div className="relative z-10 container mx-auto px-4">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-5xl font-black text-white mb-6">
+          <div className="text-center mb-12 sm:mb-16 animate-fade-in-up">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 sm:mb-6">
               Contactez <span className="bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">Nous</span>
             </h2>
-            <p className="text-xl text-white/80">Prêt à concrétiser votre projet ? Parlons-en !</p>
+            <p className="text-lg sm:text-xl text-white/80">Prêt à concrétiser votre projet ? Parlons-en !</p>
           </div>
           
-          <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 max-w-6xl mx-auto">
             {/* Formulaire de contact */}
-            <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 animate-fade-in-up">
-              <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
-                <Mail className="mr-3" />
+            <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl sm:rounded-2xl lg:rounded-3xl p-6 sm:p-8 animate-fade-in-up">
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 flex items-center">
+                <Mail className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6" />
                 Envoyez-nous un message
               </h3>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
-                    <Label htmlFor="name" className="text-white/80">Nom complet</Label>
+                    <Label htmlFor="name" className="text-white/80 text-sm sm:text-base">Nom complet</Label>
                     <Input
                       id="name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
-                      className="bg-white/10 border-white/30 text-white placeholder-white/50 rounded-xl"
+                      className="bg-white/10 border-white/30 text-white placeholder-white/50 rounded-lg sm:rounded-xl text-sm sm:text-base"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email" className="text-white/80">Email</Label>
+                    <Label htmlFor="email" className="text-white/80 text-sm sm:text-base">Email</Label>
                     <Input
                       id="email"
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       required
-                      className="bg-white/10 border-white/30 text-white placeholder-white/50 rounded-xl"
+                      className="bg-white/10 border-white/30 text-white placeholder-white/50 rounded-lg sm:rounded-xl text-sm sm:text-base"
                     />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="subject" className="text-white/80">Sujet</Label>
+                  <Label htmlFor="subject" className="text-white/80 text-sm sm:text-base">Sujet</Label>
                   <Input
                     id="subject"
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     required
-                    className="bg-white/10 border-white/30 text-white placeholder-white/50 rounded-xl"
+                    className="bg-white/10 border-white/30 text-white placeholder-white/50 rounded-lg sm:rounded-xl text-sm sm:text-base"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="message" className="text-white/80">Message</Label>
+                  <Label htmlFor="message" className="text-white/80 text-sm sm:text-base">Message</Label>
                   <Textarea
                     id="message"
                     rows={5}
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     required
-                    className="bg-white/10 border-white/30 text-white placeholder-white/50 rounded-xl"
+                    className="bg-white/10 border-white/30 text-white placeholder-white/50 rounded-lg sm:rounded-xl text-sm sm:text-base"
                   />
                 </div>
                 <Button 
                   type="submit" 
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105"
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 rounded-lg sm:rounded-xl font-semibold text-base sm:text-lg transition-all duration-300 transform hover:scale-105"
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white mr-2" />
+                      <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-2 border-white/30 border-t-white mr-2" />
                       Envoi en cours...
                     </>
                   ) : (
                     <>
                       Envoyer le message
-                      <ArrowRight className="ml-2 h-5 w-5" />
+                      <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                     </>
                   )}
                 </Button>
@@ -530,114 +541,114 @@ export default function AboutPage() {
             </div>
 
             {/* Informations de contact */}
-            <div className="space-y-8 animate-fade-in-up animation-delay-300">
+            <div className="space-y-6 sm:space-y-8 animate-fade-in-up animation-delay-300">
               {/* Contact rapide */}
-              <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8">
-                <h3 className="text-2xl font-bold text-white mb-6">Contact Rapide</h3>
-                <div className="space-y-4">
+              <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl sm:rounded-2xl lg:rounded-3xl p-6 sm:p-8">
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Contact Rapide</h3>
+                <div className="space-y-3 sm:space-y-4">
                   <Button
                     onClick={openWhatsApp}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white py-3 sm:py-4 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 transform hover:scale-105"
                     size="lg"
                   >
-                    <MessageCircle className="h-5 w-5 mr-3" />
+                    <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3" />
                     WhatsApp - Réponse Immédiate
                   </Button>
 
                   <Button
                     onClick={() => window.location.href = `mailto:${adminEmail}`}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 sm:py-4 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 transform hover:scale-105"
                     size="lg"
                   >
-                    <Mail className="h-5 w-5 mr-3" />
+                    <Mail className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3" />
                     Email Professionnel
                   </Button>
 
                   <Button
                     onClick={() => window.location.href = `tel:${adminWhatsApp}`}
-                    className="w-full md:hidden bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105"
+                    className="w-full md:hidden bg-indigo-600 hover:bg-indigo-700 text-white py-3 sm:py-4 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 transform hover:scale-105"
                     size="lg"
                   >
-                    <Phone className="h-5 w-5 mr-3" />
+                    <Phone className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3" />
                     Appel Direct
                   </Button>
                 </div>
               </div>
 
               {/* Informations détaillées */}
-              <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8">
-                <h3 className="text-2xl font-bold text-white mb-6">Nos Coordonnées</h3>
-                <div className="space-y-6">
+              <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl sm:rounded-2xl lg:rounded-3xl p-6 sm:p-8">
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Nos Coordonnées</h3>
+                <div className="space-y-4 sm:space-y-6">
                   <div className="flex items-center text-white/80 hover:text-white transition-colors group">
-                    <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-3 rounded-xl mr-4 group-hover:rotate-12 transition-transform">
-                      <Mail className="h-6 w-6" />
+                    <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-2 sm:p-3 rounded-lg sm:rounded-xl mr-3 sm:mr-4 group-hover:rotate-12 transition-transform">
+                      <Mail className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                     </div>
                     <div>
-                      <div className="font-semibold">Email</div>
-                      <div className="text-white/60">{adminEmail}</div>
+                      <div className="font-semibold text-sm sm:text-base">Email</div>
+                      <div className="text-white/60 text-xs sm:text-sm">{adminEmail}</div>
                     </div>
                   </div>
                   
                   <div className="flex items-center text-white/80 hover:text-white transition-colors group">
-                    <div className="bg-gradient-to-r from-green-500 to-blue-500 p-3 rounded-xl mr-4 group-hover:rotate-12 transition-transform">
-                      <Phone className="h-6 w-6" />
+                    <div className="bg-gradient-to-r from-green-500 to-blue-500 p-2 sm:p-3 rounded-lg sm:rounded-xl mr-3 sm:mr-4 group-hover:rotate-12 transition-transform">
+                      <Phone className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                     </div>
                     <div>
-                      <div className="font-semibold">Téléphone</div>
-                      <div className="text-white/60">{adminWhatsApp}</div>
+                      <div className="font-semibold text-sm sm:text-base">Téléphone</div>
+                      <div className="text-white/60 text-xs sm:text-sm">{adminWhatsApp}</div>
                     </div>
                   </div>
                   
                   <div className="flex items-center text-white/80 hover:text-white transition-colors group">
-                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-xl mr-4 group-hover:rotate-12 transition-transform">
-                      <MapPin className="h-6 w-6" />
+                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-2 sm:p-3 rounded-lg sm:rounded-xl mr-3 sm:mr-4 group-hover:rotate-12 transition-transform">
+                      <MapPin className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                     </div>
                     <div>
-                      <div className="font-semibold">Adresse</div>
-                      <div className="text-white/60">Yaoundé, Cameroun</div>
+                      <div className="font-semibold text-sm sm:text-base">Adresse</div>
+                      <div className="text-white/60 text-xs sm:text-sm">Yaoundé, Cameroun</div>
                     </div>
                   </div>
                   
                   <div className="flex items-center text-white/80 hover:text-white transition-colors group">
-                    <div className="bg-gradient-to-r from-orange-500 to-red-500 p-3 rounded-xl mr-4 group-hover:rotate-12 transition-transform">
-                      <Clock className="h-6 w-6" />
+                    <div className="bg-gradient-to-r from-orange-500 to-red-500 p-2 sm:p-3 rounded-lg sm:rounded-xl mr-3 sm:mr-4 group-hover:rotate-12 transition-transform">
+                      <Clock className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                     </div>
                     <div>
-                      <div className="font-semibold">Horaires</div>
-                      <div className="text-white/60">Lun-Ven: 8h-19h | Sam: 9h-17h</div>
-                      <div className="text-white/60">Dim: Support d'urgence</div>
+                      <div className="font-semibold text-sm sm:text-base">Horaires</div>
+                      <div className="text-white/60 text-xs sm:text-sm">Lun-Ven: 8h-19h | Sam: 9h-17h</div>
+                      <div className="text-white/60 text-xs sm:text-sm">Dim: Support d'urgence</div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Garanties et certifications */}
-              <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8">
-                <h3 className="text-2xl font-bold text-white mb-6">Nos Garanties</h3>
-                <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl sm:rounded-2xl lg:rounded-3xl p-6 sm:p-8">
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Nos Garanties</h3>
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
                   <div className="text-center">
-                    <div className="bg-green-500 p-3 rounded-full inline-block mb-2">
-                      <CheckCircle className="h-6 w-6 text-white" />
+                    <div className="bg-green-500 p-2 sm:p-3 rounded-full inline-block mb-1 sm:mb-2">
+                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white" />
                     </div>
-                    <div className="text-white/80 text-sm">Qualité Garantie</div>
+                    <div className="text-white/80 text-xs sm:text-sm">Qualité Garantie</div>
                   </div>
                   <div className="text-center">
-                    <div className="bg-blue-500 p-3 rounded-full inline-block mb-2">
-                      <Shield className="h-6 w-6 text-white" />
+                    <div className="bg-blue-500 p-2 sm:p-3 rounded-full inline-block mb-1 sm:mb-2">
+                      <Shield className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white" />
                     </div>
-                    <div className="text-white/80 text-sm">SAV 2 ans</div>
+                    <div className="text-white/80 text-xs sm:text-sm">SAV 2 ans</div>
                   </div>
                   <div className="text-center">
-                    <div className="bg-purple-500 p-3 rounded-full inline-block mb-2">
-                      <Award className="h-6 w-6 text-white" />
+                    <div className="bg-purple-500 p-2 sm:p-3 rounded-full inline-block mb-1 sm:mb-2">
+                      <Award className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white" />
                     </div>
-                    <div className="text-white/80 text-sm">Certifié ISO</div>
+                    <div className="text-white/80 text-xs sm:text-sm">Certifié ISO</div>
                   </div>
                   <div className="text-center">
-                    <div className="bg-yellow-500 p-3 rounded-full inline-block mb-2">
-                      <Star className="h-6 w-6 text-white" />
+                    <div className="bg-yellow-500 p-2 sm:p-3 rounded-full inline-block mb-1 sm:mb-2">
+                      <Star className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white" />
                     </div>
-                    <div className="text-white/80 text-sm">5★ Client</div>
+                    <div className="text-white/80 text-xs sm:text-sm">5★ Client</div>
                   </div>
                 </div>
               </div>
@@ -647,16 +658,16 @@ export default function AboutPage() {
       </section>
 
       {/* Section Témoignages avec carousel */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 via-white to-blue-50">
+      <section className="py-16 sm:py-20 bg-gradient-to-br from-gray-50 via-white to-blue-50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-5xl font-black text-gray-900 mb-6">
+          <div className="text-center mb-12 sm:mb-16 animate-fade-in-up">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-4 sm:mb-6">
               Ce Que Disent Nos <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Clients</span>
             </h2>
-            <p className="text-xl text-gray-600">Des témoignages authentiques de satisfaction</p>
+            <p className="text-lg sm:text-xl text-gray-600">Des témoignages authentiques de satisfaction</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
             {[
               {
                 name: "Marie Dubois",
@@ -682,26 +693,26 @@ export default function AboutPage() {
             ].map((testimonial, index) => (
               <div 
                 key={index}
-                className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 animate-fade-in-up"
+                className="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl lg:rounded-3xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 sm:hover:-translate-y-2 animate-fade-in-up"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
-                <div className="flex items-center mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                <div className="flex items-center mb-4 sm:mb-6">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-base sm:text-lg mr-3 sm:mr-4">
                     {testimonial.avatar}
                   </div>
                   <div>
-                    <div className="font-bold text-gray-900">{testimonial.name}</div>
-                    <div className="text-gray-600 text-sm">{testimonial.role}</div>
+                    <div className="font-bold text-gray-900 text-sm sm:text-base">{testimonial.name}</div>
+                    <div className="text-gray-600 text-xs sm:text-sm">{testimonial.role}</div>
                   </div>
                 </div>
                 
-                <div className="flex mb-4">
+                <div className="flex mb-3 sm:mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                    <Star key={i} className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
                 
-                <p className="text-gray-700 leading-relaxed italic">
+                <p className="text-gray-700 leading-relaxed italic text-xs sm:text-sm">
                   "{testimonial.content}"
                 </p>
               </div>
@@ -711,16 +722,16 @@ export default function AboutPage() {
       </section>
 
       {/* Section FAQ Interactive */}
-      <section className="py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-5xl font-black text-gray-900 mb-6">
+          <div className="text-center mb-12 sm:mb-16 animate-fade-in-up">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-4 sm:mb-6">
               Questions <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Fréquentes</span>
             </h2>
-            <p className="text-xl text-gray-600">Trouvez rapidement les réponses à vos questions</p>
+            <p className="text-lg sm:text-xl text-gray-600">Trouvez rapidement les réponses à vos questions</p>
           </div>
 
-          <div className="max-w-4xl mx-auto space-y-4">
+          <div className="max-w-4xl mx-auto space-y-3 sm:space-y-4">
             {[
               {
                 question: "Quels types de produits pouvez-vous personnaliser ?",
@@ -747,20 +758,20 @@ export default function AboutPage() {
               return (
                 <div 
                   key={index}
-                  className="bg-gray-50 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up"
+                  className="bg-gray-50 rounded-xl sm:rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="w-full p-6 text-left flex justify-between items-center hover:bg-gray-100 transition-colors"
+                    className="w-full p-4 sm:p-6 text-left flex justify-between items-center hover:bg-gray-100 transition-colors"
                   >
-                    <h3 className="font-bold text-lg text-gray-900">{faq.question}</h3>
+                    <h3 className="font-bold text-gray-900 text-sm sm:text-base md:text-lg">{faq.question}</h3>
                     <div className={`transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-                      <ArrowRight className="h-5 w-5 text-gray-600 rotate-90" />
+                      <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 rotate-90" />
                     </div>
                   </button>
-                  <div className={`px-6 pb-6 transition-all duration-300 ${isOpen ? 'block' : 'hidden'}`}>
-                    <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                  <div className={`px-4 sm:px-6 pb-4 sm:pb-6 transition-all duration-300 ${isOpen ? 'block' : 'hidden'}`}>
+                    <p className="text-gray-600 leading-relaxed text-xs sm:text-sm">{faq.answer}</p>
                   </div>
                 </div>
               );
@@ -770,61 +781,61 @@ export default function AboutPage() {
       </section>
 
       {/* Call-to-Action Final */}
-      <section className="py-20 bg-gradient-to-r from-blue-900 via-purple-900 to-indigo-900 relative overflow-hidden">
+      <section className="py-16 sm:py-20 bg-gradient-to-r from-blue-900 via-purple-900 to-indigo-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/40" />
         
         {/* Effets visuels */}
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-32 h-32 bg-blue-400/20 rounded-full blur-xl animate-pulse" />
-          <div className="absolute bottom-20 right-20 w-48 h-48 bg-purple-400/20 rounded-full blur-xl animate-pulse animation-delay-1000" />
+          <div className="absolute top-20 left-10 sm:left-20 w-20 h-20 sm:w-32 sm:h-32 bg-blue-400/20 rounded-full blur-xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 sm:right-20 w-24 h-24 sm:w-48 sm:h-48 bg-purple-400/20 rounded-full blur-xl animate-pulse animation-delay-1000" />
         </div>
 
         <div className="relative z-10 container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto animate-fade-in-up">
-            <h2 className="text-5xl md:text-6xl font-black text-white mb-8">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 sm:mb-8">
               Prêt à Créer Quelque Chose d'
               <span className="bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">Extraordinaire</span> ?
             </h2>
-            <p className="text-2xl text-white/80 mb-12 max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl md:text-2xl text-white/80 mb-8 sm:mb-12 max-w-2xl mx-auto">
               Rejoignez plus de 15 000 clients satisfaits et transformez vos idées en réalité
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mb-8 sm:mb-12">
               <Button 
                 onClick={openWhatsApp}
                 size="lg" 
-                className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white px-10 py-6 rounded-full font-bold text-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl group"
+                className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white px-6 py-3 sm:px-8 sm:py-4 md:px-10 md:py-6 rounded-full font-bold text-base sm:text-lg md:text-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl group"
               >
-                <MessageCircle className="mr-3 h-6 w-6" />
+                <MessageCircle className="mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                 Commencer Maintenant
-                <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 sm:ml-3 h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 group-hover:translate-x-1 transition-transform" />
               </Button>
               
               <Button 
                 variant="outline" 
                 size="lg"
-                className="border-white/30 text-white hover:bg-white/10 px-10 py-6 rounded-full font-bold text-xl backdrop-blur-sm transition-all duration-300 hover:scale-105"
+                className="border-white/30 text-white hover:bg-white/10 px-6 py-3 sm:px-8 sm:py-4 md:px-10 md:py-6 rounded-full font-bold text-base sm:text-lg md:text-xl backdrop-blur-sm transition-all duration-300 hover:scale-105"
               >
                 Découvrir le Catalogue
               </Button>
             </div>
 
             {/* Badges de confiance */}
-            <div className="flex flex-wrap justify-center items-center gap-8 text-white/60">
+            <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 md:gap-8 text-white/60 text-xs sm:text-sm">
               <div className="flex items-center">
-                <Shield className="h-5 w-5 mr-2" />
+                <Shield className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
                 <span>Paiement Sécurisé</span>
               </div>
               <div className="flex items-center">
-                <Truck className="h-5 w-5 mr-2" />
+                <Truck className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
                 <span>Livraison Garantie</span>
               </div>
               <div className="flex items-center">
-                <Award className="h-5 w-5 mr-2" />
+                <Award className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
                 <span>Qualité Certifiée</span>
               </div>
               <div className="flex items-center">
-                <Headphones className="h-5 w-5 mr-2" />
+                <Headphones className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
                 <span>Support 24/7</span>
               </div>
             </div>
@@ -833,90 +844,6 @@ export default function AboutPage() {
       </section>
 
       <Footer />
-      
-      {/* Styles CSS personnalisés pour les animations */}
-      <style jsx>{`
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        
-        @keyframes spin-slow {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-        
-        .animate-fade-in-up {
-          animation: fade-in-up 0.8s ease-out;
-        }
-        
-        .animate-fade-in {
-          animation: fade-in 0.6s ease-out;
-        }
-        
-        .animate-spin-slow {
-          animation: spin-slow 3s linear infinite;
-        }
-        
-        .animation-delay-300 {
-          animation-delay: 300ms;
-        }
-        
-        .animation-delay-1000 {
-          animation-delay: 1000ms;
-        }
-        
-        /* Effet de survol pour les cartes */
-        .hover\\:shadow-2xl:hover {
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-        
-        /* Animation des gradients */
-        .bg-gradient-to-r {
-          background-size: 200% 200%;
-          animation: gradient-shift 4s ease infinite;
-        }
-        
-        @keyframes gradient-shift {
-          0%, 100% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-        }
-        
-        /* Effet parallax léger */
-        .parallax {
-          transform: translate3d(0, 0, 0);
-        }
-        
-        /* Améliorations responsive */
-        @media (max-width: 768px) {
-          .text-6xl { font-size: 3rem; }
-          .text-5xl { font-size: 2.5rem; }
-          .text-4xl { font-size: 2rem; }
-        }
-      `}</style>
     </div>
   );
 }
