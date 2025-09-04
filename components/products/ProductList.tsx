@@ -153,12 +153,12 @@ export function ProductList() {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      {product.New && (
+                      {product.new && (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                           Nouveau
                         </span>
                       )}
-                      {product.isOnSale && (
+                      {product.onSale && (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                           Promo
                         </span>
