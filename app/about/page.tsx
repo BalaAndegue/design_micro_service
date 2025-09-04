@@ -670,21 +670,21 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
             {[
               {
-                name: "Marie Dubois",
+                name: "Bala Andegue",
                 role: "Entrepreneuse",
                 content: "CustomWorld a transformé mon entreprise ! La qualité des produits personnalisés dépasse toutes mes attentes. L'équipe est réactive et professionnelle.",
                 rating: 5,
                 avatar: "M"
               },
               {
-                name: "Jean-Paul Nkomo",
+                name: "Azangue Leonel",
                 role: "Designer",
                 content: "En tant que designer, j'apprécie particulièrement la précision des finitions et les possibilités créatives infinies offertes par CustomWorld.",
                 rating: 5,
                 avatar: "J"
               },
               {
-                name: "Fatou Diallo",
+                name: "Abat Marcel",
                 role: "Chef d'entreprise",
                 content: "Service client exceptionnel ! Ils ont su comprendre ma vision et la concrétiser parfaitement. Je recommande vivement leurs services.",
                 rating: 5,
@@ -781,7 +781,7 @@ export default function AboutPage() {
       </section>
 
       {/* Call-to-Action Final */}
-      <section className="py-16 sm:py-20 bg-gradient-to-r from-blue-900 via-purple-900 to-indigo-900 relative overflow-hidden">
+      <section className="py-16 sm:py-20 bg-gradient-to-r from-blue-900 via-blue-900 to-blue-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/40" />
         
         {/* Effets visuels */}
