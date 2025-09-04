@@ -28,7 +28,7 @@ export function ProductCard({
         productName: product.name,
         price: product.price, // Utilisez product.price au lieu de product.originalPrice
         quantity: 1,
-        image: product.imagePath,
+        imagePath: product.imagePath,
         customizations: {}
       });
       
