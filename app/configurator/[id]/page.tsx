@@ -108,11 +108,12 @@ export default function ConfiguratorPage() {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     addItem({
+      id:mockProduct.id,
       productId: mockProduct.id,
-      name: mockProduct.name,
+      productName: mockProduct.name,
       price: calculatePrice(),
       quantity,
-      image: uploadedImage || mockProduct.image,
+      imagePath: uploadedImage || mockProduct.image,
       customizations: {
         color: selectedColor.name,
         pattern: selectedPattern.name,
