@@ -90,7 +90,7 @@ const buildPublicApiUrl = (prefix:string,endpoint: string): string => {
 // STATISTIQUES (uniquement pour ADMIN)
 export const fetchStats = async (): Promise<Stats> => {
   try {
-    const res = await fetch(buildApiUrl('stats'), {
+    const res = await fetch(buildApiUrl('statistics'), {
       method: 'GET',
       headers: getAuthHeaders(),
       cache: 'no-store',
