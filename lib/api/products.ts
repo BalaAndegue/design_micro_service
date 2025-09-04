@@ -153,7 +153,7 @@ export const createProduct = async (product: Omit<Product, 'id' | 'createdAt' | 
 
 export const updateProduct = async (id: number, product: Partial<Omit<Product, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Product> => {
   try {
-    const res = await fetch(buildApiUrl(`products/${id}`), {
+    const res = await fetch(buildPublicApiUrl('admin',`products/${id}`), {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(product),
