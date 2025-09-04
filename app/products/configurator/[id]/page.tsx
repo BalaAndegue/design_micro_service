@@ -124,11 +124,12 @@ export default function ConfiguratorPage() {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     addItem({
+      id:product.id,
       productId: product.id,
-      name: product.name ,
+      productName: product.name ,
       price: calculatePrice(),
       quantity,
-      image: uploadedImage || product?.imagePath || '',
+      imagePath: uploadedImage || product?.imagePath || '',
       customizations: {
         color: selectedColor.name,
         pattern: selectedPattern.name,
