@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from './layout/headerstes';
 import { Product, fetchProducts } from '@/lib/api/products';
 import { Footer } from '@/components/layout/footer';
+import FloatingCart from './FloatingCart';
 
 type ProductWithImage = Product & {
   image: string;
@@ -416,20 +417,7 @@ const CostumWorldLanding = () => {
       <Footer />
 
       {/* Floating CTA */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1 }}
-        className="fixed bottom-6 right-6 z-50"
-      >
-        <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full p-4 shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center space-x-2 group">
-          <ShoppingBag className="w-6 h-6" />
-          <span className="hidden sm:inline-block font-medium">Cart (3)</span>
-          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
-            3
-          </span>
-        </button>
-      </motion.div>
+      <FloatingCart/>
     </div>
   );
 };
