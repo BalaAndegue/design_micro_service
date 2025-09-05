@@ -150,7 +150,7 @@ export default function ConfiguratorPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Aperçu du produit */}
-          <div className="space-y-6">
+          <div className="space-y-6 mt-12">
             <Card className="overflow-hidden">
               <div className="relative aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                 <div 
@@ -304,7 +304,7 @@ export default function ConfiguratorPage() {
           </div>
 
           {/* Configurateur */}
-          <div className="space-y-6">
+          <div className="space-y-6 mt-12">
             <Card>
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center">

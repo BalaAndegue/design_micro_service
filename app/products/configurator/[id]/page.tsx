@@ -21,7 +21,7 @@ import {
   Star,
   Upload
 } from 'lucide-react';
-import { Header } from '@/components/layout/header';
+import { Header } from '@/components/layout/headerstes';
 import { useCart } from '@/providers/cart-provider';
 import { toast } from 'sonner';
 import { useParams } from 'next/navigation';
@@ -230,7 +230,7 @@ export default function ConfiguratorPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Aperçu du produit */}
-          <div className="space-y-6">
+          <div className="space-y-6 mt-12">
             <Card className="overflow-hidden">
               <div className="relative aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                 <div 
@@ -299,7 +299,7 @@ export default function ConfiguratorPage() {
                       Ajouter votre propre image
                     </Label>
                     {uploadedImage && (
-                      <Badge className="bg-blue-600">+€5.00</Badge>
+                      <Badge className="bg-blue-600">+XAF 5.00</Badge>
                     )}
                   </div>
                   
@@ -384,7 +384,7 @@ export default function ConfiguratorPage() {
           </div>
 
           {/* Configurateur */}
-          <div className="space-y-6">
+          <div className="space-y-6 mt-12">
             <Card>
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center">
@@ -422,7 +422,7 @@ export default function ConfiguratorPage() {
                             <p className="text-xs text-center mt-1 font-medium">{color.name}</p>
                             {color.premium && (
                               <Badge className="absolute -top-1 -right-1 text-xs bg-orange-500">
-                                +€{color.price}
+                                +XAF {color.price}
                               </Badge>
                             )}
                           </div>
@@ -484,7 +484,7 @@ export default function ConfiguratorPage() {
                       />
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
                         <span>{customText.length}/20 caractères</span>
-                        {customText.trim() && <span className="text-blue-600">+€3.00</span>}
+                        {customText.trim() && <span className="text-blue-600">+XAF 3.00</span>}
                       </div>
                     </div>
                   </TabsContent>
@@ -527,41 +527,41 @@ export default function ConfiguratorPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Produit de base</span>
-                    <span>€{product.originalPrice}</span>
+                    <span>XAF {product.originalPrice}</span>
                   </div>
                   
                   {selectedColor.premium && (
                     <div className="flex justify-between">
                       <span>Couleur premium ({selectedColor.name})</span>
-                      <span>+€{selectedColor.price}</span>
+                      <span>+XAF {selectedColor.price}</span>
                     </div>
                   )}
                   
                   {selectedPattern.price > 0 && (
                     <div className="flex justify-between">
                       <span>Motif ({selectedPattern.name})</span>
-                      <span>+€{selectedPattern.price}</span>
+                      <span>+XAF {selectedPattern.price}</span>
                     </div>
                   )}
                   
                   {selectedSize.price > 0 && (
                     <div className="flex justify-between">
                       <span>Taille ({selectedSize.name})</span>
-                      <span>+€{selectedSize.price}</span>
+                      <span>+XAF {selectedSize.price}</span>
                     </div>
                   )}
                   
                   {customText.trim() && (
                     <div className="flex justify-between">
                       <span>Texte personnalisé</span>
-                      <span>+€3.00</span>
+                      <span>+XAF 3.00</span>
                     </div>
                   )}
                   
                   {uploadedImage && (
                     <div className="flex justify-between">
                       <span>Image personnalisée</span>
-                      <span>+€5.00</span>
+                      <span>+XAF 5.00</span>
                     </div>
                   )}
                 </div>

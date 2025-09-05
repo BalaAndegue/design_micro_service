@@ -47,7 +47,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-semibold text-gray-900">{product.name}</h3>
           <div className="flex flex-col items-end">
-            <div className="text-sm font-bold text-blue-600">${product.price}</div>
+            <div className="text-sm font-bold text-blue-600">XAF {product.price}</div>
             {product.originalPrice > product.price && (
               <div className="text-xs text-gray-500 line-through">${product.originalPrice}</div>
             )}
@@ -172,7 +172,8 @@ const CostumWorldLanding = () => {
 
   // Filtrer les produits pour New Arrivals (produits avec onSlae = true)
   const newArrivalProducts = products
-    .filter(product => product.onSale);
+    .filter(product => product.onSale)
+    .slice(0,3);
 
   return (
     <div className="min-h-screen bg-gray-50">
