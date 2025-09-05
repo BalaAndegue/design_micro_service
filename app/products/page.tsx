@@ -1,7 +1,5 @@
 'use client';
 
-
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,23 +9,11 @@ import { Search, Grid3X3, List } from 'lucide-react';
 import { Header } from '@/components/layout/headerstes';
 import { Footer } from '@/components/layout/footer';
 import { useCart } from '@/providers/cart-provider';
-import { fetchProducts ,Product, fetchCategories, Category} from '@/lib/api/products';
+import { fetchProducts, Product, fetchCategories, Category } from '@/lib/api/products';
 import { ProductCard } from '@/components/products/ProductCard';
-
 import { Skeleton } from '@/components/ui/skeleton';
 import { ProductCardSkeleton } from '@/components/products/ProductCardSkeleton';
-import { useRouter , useSearchParams} from 'next/navigation';
-
-const categories = [
-  { value: 'all', label: 'Toutes les catégories' },
-  { value: 'coques', label: 'Coques' },
-  { value: 'telephones', label: 'Téléphones' },
-  { value: 'tablettes', label: 'Tablettes' },
-  { value: 'ordinateurs', label: 'Ordinateurs' },
-  { value: 'montres', label: 'Montres' },
-  { value: 'vetements', label: 'Vêtements' },
-  { value: 'accessoires', label: 'Accessoires' }
-];
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const sortOptions = [
   { value: 'popular', label: 'Plus populaires' },
@@ -37,15 +23,12 @@ const sortOptions = [
   { value: 'rating', label: 'Mieux notés' }
 ];
 
-export default function ProductsPage(
-) {
-  const searchParams  = new URLSearchParams();
-  
+export default function ProductsPage() {
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState(
     searchParams?.get('search') || ''
   );
-  //const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('popular');
   const [categories, setCategories] = useState<Category[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -53,7 +36,7 @@ export default function ProductsPage(
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState( 
-    searchParams?.get('category') || 'all'
+    searchParams?.get('category') || ''
   );
 
   const { addItem } = useCart();
@@ -63,28 +46,25 @@ export default function ProductsPage(
     setSearchTerm(term);
     const params = new URLSearchParams();
     if (term) params.set('search', term);
-    if (selectedCategory !== 'all') params.set('category', selectedCategory);
+    if (selectedCategory && selectedCategory !== 'all') params.set('category', selectedCategory);
     router.push(`/products?${params.toString()}`);
   };
 
-  // Modifiez le handler de catégorie
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
     const params = new URLSearchParams();
     if (searchTerm) params.set('search', searchTerm);
-    if (value !== 'all') params.set('category', value);
+    if (value && value !== 'all') params.set('category', value);
     router.push(`/products?${params.toString()}`);
   };
 
-
   useEffect(() => {
-      fetchCategories().then(setCategories).catch(err => {
-        console.error("Erreur lors du chargement des catégories:", err);
-        setError("Erreur lors du chargement des catégories");
-      });
-    }, []);
+    fetchCategories().then(setCategories).catch(err => {
+      console.error("Erreur lors du chargement des catégories:", err);
+      setError("Erreur lors du chargement des catégories");
+    });
+  }, []);
   
-
   useEffect(() => {
     const loadProducts = async () => {
       try {
@@ -107,7 +87,7 @@ export default function ProductsPage(
   useEffect(() => {
     let filtered = products.filter(product => {
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+      const matchesCategory = !selectedCategory || selectedCategory === 'all' || product.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
 
@@ -115,9 +95,9 @@ export default function ProductsPage(
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'price-low':
-          return a.originalPrice || 0 - b.originalPrice ;
+          return (a.originalPrice || 0) - (b.originalPrice || 0);
         case 'price-high':
-          return b.originalPrice || 0 - a.originalPrice;
+          return (b.originalPrice || 0) - (a.originalPrice || 0);
         case 'rating':
           return (b.rating || 0) - (a.rating || 0);
         case 'newest':
@@ -160,9 +140,10 @@ export default function ProductsPage(
               {/* Catégorie */}
               <Select value={selectedCategory} onValueChange={handleCategoryChange}>
                 <SelectTrigger className="w-full sm:w-48">
-                  <SelectValue placeholder="Catégorie" />
+                  <SelectValue placeholder="Catégories" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="all">Toutes les catégories</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.name}>
                       {category.name}
@@ -255,7 +236,6 @@ export default function ProductsPage(
                 key={product.id} 
                 product={product} 
                 viewMode={viewMode}
-                
               />
             ))
           )}
