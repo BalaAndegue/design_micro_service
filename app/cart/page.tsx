@@ -209,7 +209,7 @@ export default function CartPage() {
                   {discount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Réduction</span>
-                      <span>-€{discount.toFixed(2)}</span>
+                      <span>-XAF{discount.toFixed(2)}</span>
                     </div>
                   )}
                   
@@ -226,7 +226,7 @@ export default function CartPage() {
                   
                   {totalPrice < 50 && (
                     <p className="text-xs text-blue-600">
-                      Livraison gratuite dès €50 d'achat !
+                      Livraison gratuite dès XAF 50 d'achat !
                     </p>
                   )}
                 </div>

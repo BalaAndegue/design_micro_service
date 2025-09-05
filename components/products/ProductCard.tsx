@@ -70,7 +70,7 @@ export function ProductCard({
             </div>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
-                <span className="text-lg font-bold text-blue-600">€{product.price}</span>
+                <span className="text-lg font-bold text-blue-600">XAF{product.price}</span>
                 {product.originalPrice && product.originalPrice > product.price  && (
                   <span className="text-sm text-gray-500 line-through">€{product.originalPrice}</span>
                 )}
@@ -120,7 +120,7 @@ export function ProductCard({
                   <div className="flex items-center space-x-2 mb-2">
                     <span className="text-lg font-bold text-blue-600">€{product.price}</span>
                     {product.originalPrice && product.originalPrice > product.price && (
-                      <span className="text-sm text-gray-500 line-through">€{product.originalPrice}</span>
+                      <span className="text-sm text-gray-500 line-through">XAF{product.originalPrice}</span>
                     )}
                   </div>
                   <div className="flex gap-2">

@@ -43,7 +43,7 @@ export const Footer = () => {
                 <ShoppingBag className="w-5 h-5 text-white" />
               </div>
               <h3 className="text-xl font-bold text-white">
-                costum<span className="text-blue-400">world</span>
+                custom<span className="text-blue-400">world</span>
               </h3>
             </div>
             <p className="mb-4">
