@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+// app/checkout/page.tsx (extrait modifié)
+
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,14 +20,20 @@ import {
   Lock,
   Truck,
   ArrowLeft,
-  CheckCircle
+  CheckCircle,
+  Smartphone
 } from 'lucide-react';
-import { Header } from '@/components/layout/header';
+import { Header } from '@/components/layout/headerstes';
 import { useCart } from '@/providers/cart-provider';
 import { useAuth } from '@/providers/auth-provider';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { 
+  initiateNotchPayPayment, 
+  checkPaymentStatus,
+  type NotchPayInitiateRequest 
+} from '@/lib/api/payements';
 
 const shippingMethods = [
   {
@@ -51,6 +59,12 @@ const shippingMethods = [
   }
 ];
 
+const notchPayChannels = [
+  { value: 'orange_money', label: 'Orange Money' },
+  { value: 'mtn_mobile_money', label: 'MTN Mobile Money' },
+  { value: 'express_union', label: 'Express Union Mobile Money' },
+];
+
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
   const { user } = useAuth();
@@ -59,6 +73,9 @@ export default function CheckoutPage() {
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedShipping, setSelectedShipping] = useState(shippingMethods[0]);
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'notchpay'>('card');
+  const [selectedChannel, setSelectedChannel] = useState(notchPayChannels[0].value);
+  const [currentTransaction, setCurrentTransaction] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     email: user?.email || '',
@@ -67,7 +84,7 @@ export default function CheckoutPage() {
     address: '',
     city: '',
     postalCode: '',
-    country: 'France',
+    country: 'Cameroun',
     phone: '',
     cardNumber: '',
     expiryDate: '',
@@ -92,27 +109,148 @@ export default function CheckoutPage() {
     if (step > 1) setStep(step - 1);
   };
 
-  const handleOrder = async () => {
+  const initiateNotchPay = async () => {
+    setIsProcessing(true);
+    
+    try {
+      const paymentData: NotchPayInitiateRequest = {
+        amount: totalWithShipping,
+        description: `Commande CustomWorld - ${items.length} article(s)`,
+        customerName: formData.firstName,
+        customerSurname: formData.lastName,
+        customerPhoneNumber: formData.phone.replace(/\s+/g, ''),
+        customerEmail: formData.email,
+        channelOption: selectedChannel,
+        customerAddress: formData.address,
+        customerCity: formData.city,
+        customerZipCode: formData.postalCode
+      };
+
+      const result = await initiateNotchPayPayment(paymentData);
+      
+      const authorizationUrl = result.authorization_url || result.transaction?.authorization_url;
+      
+      if (!authorizationUrl) {
+        throw new Error('URL de paiement non reçue');
+      }
+
+      // Sauvegarder la référence de transaction pour vérification ultérieure
+      if (result.transaction?.reference) {
+        setCurrentTransaction(result.transaction.reference);
+        localStorage.setItem('currentTransaction', result.transaction.reference);
+      }
+
+      // Ouvrir dans un nouvel onglet
+      const newWindow = window.open(authorizationUrl, '_blank', 'noopener,noreferrer');
+      
+      if (newWindow) {
+        newWindow.focus();
+        
+        toast.success('Paiement en cours', {
+          description: 'Complétez le paiement dans le nouvel onglet',
+          duration: 5000
+        });
+
+        // Démarrer la surveillance du statut
+        startPaymentStatusCheck(result.transaction?.reference);
+        
+      } else {
+        // Fallback si les popups sont bloqués
+        toast.warning('Ouvrir manuellement', {
+          description: 'Veuillez cliquer pour ouvrir la page de paiement',
+          action: {
+            label: 'Ouvrir',
+            onClick: () => window.location.href = authorizationUrl
+          },
+          duration: 10000
+        });
+      }
+
+    } catch (error) {
+      console.error('Erreur NotchPay:', error);
+      toast.error(error instanceof Error ? error.message : 'Erreur lors du lancement du paiement');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const startPaymentStatusCheck = (transactionReference: string | undefined) => {
+    if (!transactionReference) return;
+
+    // Vérifier périodiquement le statut
+    const interval = setInterval(async () => {
+      try {
+        const status = await checkPaymentStatus(transactionReference);
+        
+        if (status.status === 'completed' || status.status === 'success') {
+          clearInterval(interval);
+          completeOrder(status.orderId);
+        } else if (status.status === 'failed' || status.status === 'cancelled') {
+          clearInterval(interval);
+          toast.error('Paiement échoué ou annulé');
+        }
+      } catch (error) {
+        console.error('Erreur vérification statut:', error);
+      }
+    }, 5000); // Vérifier toutes les 5 secondes
+
+    // Arrêter après 10 minutes
+    setTimeout(() => clearInterval(interval), 600000);
+  };
+
+  const processCardPayment = async () => {
+    setIsProcessing(true);
+    
+    try {
+      // Simulation de traitement de carte bancaire
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      completeOrder();
+      
+    } catch (error) {
+      console.error('Erreur paiement carte:', error);
+      toast.error('Erreur lors du traitement du paiement');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const completeOrder = (orderId?: string) => {
+    const orderNumber = orderId || `CMD-${Date.now().toString().slice(-6)}`;
+    
+    toast.success('Paiement confirmé !', {
+      description: `Numéro de commande: ${orderNumber}`
+    });
+    
+    clearCart();
+    localStorage.removeItem('currentTransaction');
+    setCurrentTransaction(null);
+    
+    router.push(`/order-confirmation?order=${orderNumber}`);
+  };
+
+  const handlePayment = async () => {
     if (!acceptTerms) {
       toast.error('Veuillez accepter les conditions générales');
       return;
     }
 
-    setIsProcessing(true);
-    
-    // Simulation du traitement de commande
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    // Génération d'un numéro de commande
-    const orderNumber = `CMD-${Date.now().toString().slice(-6)}`;
-    
-    toast.success('Commande confirmée !', {
-      description: `Numéro de commande: ${orderNumber}`
-    });
-    
-    clearCart();
-    router.push(`/order-confirmation?order=${orderNumber}`);
+    if (paymentMethod === 'notchpay') {
+      await initiateNotchPay();
+    } else {
+      await processCardPayment();
+    }
   };
+
+  // Vérifier les transactions en cours au chargement
+  useEffect(() => {
+    const savedTransaction = localStorage.getItem('currentTransaction');
+    if (savedTransaction) {
+      setCurrentTransaction(savedTransaction);
+      startPaymentStatusCheck(savedTransaction);
+    }
+  }, []);
+
+  // ... le reste du code reste inchangé ...
 
   if (items.length === 0) {
     return (
@@ -137,7 +275,7 @@ export default function CheckoutPage() {
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Progress Steps */}
-        <div className="mb-8">
+        <div className="mb-8 mt-12">
           <div className="flex items-center justify-center space-x-4">
             {[1, 2, 3].map((stepNumber) => (
               <div key={stepNumber} className="flex items-center">
@@ -213,6 +351,7 @@ export default function CheckoutPage() {
                       value={formData.phone}
                       onChange={(e) => handleInputChange('phone', e.target.value)}
                       required
+                      placeholder="+237 6XXXXXXXX"
                     />
                   </div>
 
@@ -252,9 +391,9 @@ export default function CheckoutPage() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="France">France</SelectItem>
-                          <SelectItem value="Belgique">Belgique</SelectItem>
-                          <SelectItem value="Suisse">Suisse</SelectItem>
+                          <SelectItem value="Cameroun">Cameroun</SelectItem>
+                          <SelectItem value="Gabon">Gabon</SelectItem>
+                          <SelectItem value="Cote d'ivoire">Cote d'ivoire</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -274,7 +413,7 @@ export default function CheckoutPage() {
                   <Button
                     onClick={handleNext}
                     className="w-full"
-                    disabled={!formData.firstName || !formData.lastName || !formData.email || !formData.address}
+                    disabled={!formData.firstName || !formData.lastName || !formData.email || !formData.address || !formData.phone}
                   >
                     Continuer vers la livraison
                   </Button>
@@ -332,53 +471,114 @@ export default function CheckoutPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <CreditCard className="h-5 w-5 mr-2" />
-                    Informations de paiement
+                    Méthode de paiement
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="cardName">Nom sur la carte *</Label>
-                    <Input
-                      id="cardName"
-                      value={formData.cardName}
-                      onChange={(e) => handleInputChange('cardName', e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="cardNumber">Numéro de carte *</Label>
-                    <Input
-                      id="cardNumber"
-                      placeholder="1234 5678 9012 3456"
-                      value={formData.cardNumber}
-                      onChange={(e) => handleInputChange('cardNumber', e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="expiryDate">Date d'expiration *</Label>
-                      <Input
-                        id="expiryDate"
-                        placeholder="MM/AA"
-                        value={formData.expiryDate}
-                        onChange={(e) => handleInputChange('expiryDate', e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="cvv">CVV *</Label>
-                      <Input
-                        id="cvv"
-                        placeholder="123"
-                        value={formData.cvv}
-                        onChange={(e) => handleInputChange('cvv', e.target.value)}
-                        required
-                      />
+                <CardContent className="space-y-6">
+                  {/* Sélection de la méthode de paiement */}
+                  <div className="space-y-4">
+                    <Label>Choisissez votre méthode de paiement</Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div
+                        className={`cursor-pointer p-4 rounded-lg border-2 transition-all ${
+                          paymentMethod === 'card' 
+                            ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                        onClick={() => setPaymentMethod('card')}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <CreditCard className="h-5 w-5" />
+                          <span>Carte bancaire</span>
+                        </div>
+                      </div>
+                      <div
+                        className={`cursor-pointer p-4 rounded-lg border-2 transition-all ${
+                          paymentMethod === 'notchpay' 
+                            ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                        onClick={() => setPaymentMethod('notchpay')}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <Smartphone className="h-5 w-5" />
+                          <span>Mobile Money</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Formulaire de paiement selon la méthode choisie */}
+                  {paymentMethod === 'card' ? (
+                    <>
+                      <div>
+                        <Label htmlFor="cardName">Nom sur la carte *</Label>
+                        <Input
+                          id="cardName"
+                          value={formData.cardName}
+                          onChange={(e) => handleInputChange('cardName', e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="cardNumber">Numéro de carte *</Label>
+                        <Input
+                          id="cardNumber"
+                          placeholder="1234 5678 9012 3456"
+                          value={formData.cardNumber}
+                          onChange={(e) => handleInputChange('cardNumber', e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="expiryDate">Date d'expiration *</Label>
+                          <Input
+                            id="expiryDate"
+                            placeholder="MM/AA"
+                            value={formData.expiryDate}
+                            onChange={(e) => handleInputChange('expiryDate', e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="cvv">CVV *</Label>
+                          <Input
+                            id="cvv"
+                            placeholder="123"
+                            value={formData.cvv}
+                            onChange={(e) => handleInputChange('cvv', e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="space-y-4">
+                      <div>
+                        <Label>Opérateur Mobile Money *</Label>
+                        <Select value={selectedChannel} onValueChange={setSelectedChannel}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {notchPayChannels.map((channel) => (
+                              <SelectItem key={channel.value} value={channel.value}>
+                                {channel.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="bg-blue-50 p-4 rounded-lg">
+                        <p className="text-sm text-blue-800">
+                          Vous serez redirigé vers la plateforme de paiement sécurisée NotchPay pour finaliser votre transaction Mobile Money.
+                        </p>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="flex items-center space-x-2">
                     <Checkbox
@@ -387,13 +587,13 @@ export default function CheckoutPage() {
                       onCheckedChange={checked => setAcceptTerms(checked === true)}
                     />
                     <Label htmlFor="acceptTerms" className="text-sm">
-                      J'accepte les <Link href="/terms" className="text-blue-600 hover:underline">conditions générales</Link> et la <Link href="/privacy" className="text-blue-600 hover:underline">politique de confidentialité</Link> *
+                      J'accepte les <Link href="/terms" className="text-blue-600 hover:underline">conditions générales</Link> *
                     </Label>
                   </div>
 
                   <div className="bg-green-50 p-4 rounded-lg flex items-center space-x-2">
                     <Lock className="h-5 w-5 text-green-600" />
-                    <span className="text-sm text-green-800">Paiement 100% sécurisé SSL</span>
+                    <span className="text-sm text-green-800">Paiement 100% sécurisé</span>
                   </div>
 
                   <div className="flex space-x-4">
@@ -402,11 +602,11 @@ export default function CheckoutPage() {
                       Retour
                     </Button>
                     <Button
-                      onClick={handleOrder}
+                      onClick={handlePayment}
                       disabled={isProcessing || !acceptTerms}
                       className="flex-1 bg-gradient-to-r from-green-600 to-green-700"
                     >
-                      {isProcessing ? 'Traitement...' : `Finaliser la commande €${totalWithShipping.toFixed(2)}`}
+                      {isProcessing ? 'Traitement...' : `Payer €${totalWithShipping.toFixed(2)}`}
                     </Button>
                   </div>
                 </CardContent>
@@ -425,29 +625,25 @@ export default function CheckoutPage() {
                   <div key={item.id} className="flex gap-3">
                     <img
                       src={item.imagePath}
-                      alt={item.imagePath}
+                      alt={item.productName}
                       className="w-16 h-16 object-cover rounded-lg"
                     />
                     <div className="flex-1">
-                      <h4 className="font-medium text-sm">{item.imagePath}</h4>
+                      <h4 className="font-medium text-sm">{item.productName}</h4>
                       <div className="flex flex-wrap gap-1 mt-1">
-
-
-
-                       
-
                         {item.customizations && 
-                        Object.entries(item.customizations).map(([key, value]) => 
-                          value && (
-                            <Badge key={key} variant="secondary" className="text-xs">
-                              {value}
-                            </Badge>
+                          Object.entries(item.customizations).map(([key, value]) => 
+                            value && (
+                              <Badge key={key} variant="secondary" className="text-xs">
+                                {value}
+                              </Badge>
+                            )
                           )
-                        )}
+                        }
                       </div>
                       <div className="flex justify-between items-center mt-2">
                         <span className="text-sm text-gray-600">Qté: {item.quantity}</span>
-                        <span className="font-medium">€{(item.price * item.quantity).toFixed(2)}</span>
+                        <span className="font-medium">XAF {(item.price * item.quantity).toFixed(2)}</span>
                       </div>
                     </div>
                   </div>
@@ -458,11 +654,11 @@ export default function CheckoutPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Sous-total</span>
-                    <span>€{totalPrice.toFixed(2)}</span>
+                    <span>XAF {totalPrice.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Livraison ({selectedShipping.name})</span>
-                    <span>€{selectedShipping.price.toFixed(2)}</span>
+                    <span>XAF {selectedShipping.price.toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -470,7 +666,7 @@ export default function CheckoutPage() {
 
                 <div className="flex justify-between items-center font-bold text-lg">
                   <span>Total</span>
-                  <span className="text-blue-600">€{totalWithShipping.toFixed(2)}</span>
+                  <span className="text-blue-600">XAF {totalWithShipping.toFixed(2)}</span>
                 </div>
               </CardContent>
             </Card>

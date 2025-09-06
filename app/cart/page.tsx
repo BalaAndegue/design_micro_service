@@ -156,7 +156,7 @@ export default function CartPage() {
                           </Button>
                         </div>
                         <span className="font-bold text-blue-600">
-                          €{(item.price * item.quantity).toFixed(2)}
+                          XAF {(item.price * item.quantity).toFixed(2)}
                         </span>
                       </div>
                     </div>
@@ -209,7 +209,7 @@ export default function CartPage() {
                   {discount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Réduction</span>
-                      <span>-XAF{discount.toFixed(2)}</span>
+                      <span>-XAF {discount.toFixed(2)}</span>
                     </div>
                   )}
                   
