@@ -96,7 +96,7 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
-            {/* Search */}
+            {/* Search 
             <Button
               variant="ghost"
               size="sm"
@@ -105,7 +105,7 @@ export function Header() {
               }`}
             >
               <Search className="h-5 w-5" />
-            </Button>
+            </Button>  */}
 
             {/* Cart */}
             <Link href="/cart">
