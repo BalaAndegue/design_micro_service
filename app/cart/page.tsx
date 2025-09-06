@@ -16,7 +16,7 @@ import {
   Shield,
   ArrowLeft
 } from 'lucide-react';
-import { Header } from '@/components/layout/header';
+import { Header } from '@/components/layout/headerstes';
 import { Footer } from '@/components/layout/footer';
 import { useCart } from '@/providers/cart-provider';
 import Link from 'next/link';
