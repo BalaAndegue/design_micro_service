@@ -34,8 +34,8 @@ export default function ProfilePage() {
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    phone: '+33 6 12 34 56 78',
-    address: '123 Rue de la Paix',
+    phone: '+237 6 56 61 67 51',
+    address: '123 Rue de Melen',
     city: 'Paris',
     postalCode: '75001',
     country: 'France'
