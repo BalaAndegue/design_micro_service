@@ -21,7 +21,7 @@ import {
   Package,
   Star
 } from 'lucide-react';
-import { Header } from '@/components/layout/header';
+import { Header } from '@/components/layout/headerstes';
 import { Footer } from '@/components/layout/footer';
 import { useAuth } from '@/providers/auth-provider';
 import { toast } from 'sonner';

@@ -114,7 +114,7 @@ export const removeFromCart = async (cartItemId: number): Promise<Cart> => {
 // Vider le panier
 export const clearCart = async (): Promise<void> => {
   try {
-    const res = await fetch(`${API_URL}/cart`, {
+    const res = await fetch(`${API_URL}/customer/cart/clear`, {
       method: 'DELETE',
       headers: getAuthHeaders(),
     });
