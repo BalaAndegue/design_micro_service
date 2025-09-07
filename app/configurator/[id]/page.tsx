@@ -288,17 +288,21 @@ export default function ConfiguratorPage() {
                     <span className="text-3xl font-bold text-blue-600">XAF {calculatePrice().toFixed(2)}</span>
                     <span className="text-sm text-gray-500 ml-2">par unité</span>
                   </div>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm">
-                      <Share2 className="h-4 w-4 mr-2" />
-                      Partager
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
-                      Aperçu
-                    </Button>
+                  <div className="flex space-x-2 mb-6">
+                   
                   </div>
                 </div>
+                <div className='space-x-4 mt-3'>
+                 <Button variant="outline" size="sm">
+                      <Share2 className="h-4 w-4 mr-2" />
+                      Partager
+                  </Button>
+                    
+                  <Button variant="outline" size="sm">
+                      <Download className="h-4 w-4 mr-2" />
+                      Aperçu
+                  </Button>
+                  </div>
               </CardContent>
             </Card>
           </div>

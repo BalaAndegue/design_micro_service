@@ -101,7 +101,7 @@ const CostumWorldLanding = () => {
   const [error, setError] = useState<string | null>(null);
 
   const categories = [
-    'Electronics', 'Fashion', 'Home & Garden', 'Beauty', 'Sports', 'Toys'
+    'Electronics', 'Fashion', 'Home & Garden', 'Beauty', 'Sports'
   ];
 
   const heroSlides = [
@@ -112,16 +112,28 @@ const CostumWorldLanding = () => {
       cta: "Shop Now"
     },
     {
-      title: "Tech Gadgets Sale",
+      title: "Premium Membership",
       subtitle: "Up to 40% off on selected items",
       image: "https://i.pinimg.com/736x/54/d9/39/54d93922987c785616babd8702170651.jpg",
       cta: "shop Now"
     },
     {
-      title: "Premium Membership",
+      title: "Summer Collection 2025",
       subtitle: "Get exclusive benefits & early access",
       image: "https://i.pinimg.com/1200x/a7/fd/9d/a7fd9d8233b50e293f20041dcc7d2741.jpg",
-      cta: "Join Now"
+      cta: "Shop Now"
+    },
+    {
+      title: "Premium Membership",
+      subtitle: "Get exclusive benefits & early access",
+      image: "https://i.pinimg.com/736x/31/09/f6/3109f6c09d18ac5ccee9e2b5364ef853.jpg",
+      cta: "Shop Now"
+    },
+    {
+      title: "Summer Collection",
+      subtitle: "Get exclusive benefits & early access",
+      image: "https://i.pinimg.com/736x/6f/64/7f/6f647f4abd4dd02bb7ea1515814d13cc.jpg",
+      cta: "Shop Now"
     }
   ];
 
