@@ -177,7 +177,7 @@ export default function OrdersPage() {
                               <StatusIcon className="h-3 w-3 mr-1" />
                               {statusConfig[order.status as keyof typeof statusConfig].label}
                             </Badge>
-                            <p className="text-lg font-bold text-blue-600 mt-1">€{order.total}</p>
+                            <p className="text-lg font-bold text-blue-600 mt-1">XAF {order.total}</p>
                           </div>
                         </div>
                       </CardHeader>
@@ -203,7 +203,7 @@ export default function OrdersPage() {
                                 </div>
                                 <div className="flex justify-between items-center mt-2">
                                   <span className="text-sm text-gray-600">Quantité: {item.quantity}</span>
-                                  <span className="font-medium">€{(item.price * item.quantity).toFixed(2)}</span>
+                                  <span className="font-medium">XAF {(item.price * item.quantity).toFixed(2)}</span>
                                 </div>
                               </div>
                             </div>

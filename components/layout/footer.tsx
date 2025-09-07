@@ -123,7 +123,7 @@ export const Footer = () => {
 
         {/* Bottom */}
         <div className="border-t border-gray-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p>© 2025 CostumWorld. All rights reserved.</p>
+          <p>© 2025 CustomWorld. All rights reserved.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="hover:text-white transition-colors">
               Privacy Policy

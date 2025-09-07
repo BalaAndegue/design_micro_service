@@ -219,7 +219,7 @@ export default function ConfiguratorPage() {
                       Ajouter votre propre image
                     </Label>
                     {uploadedImage && (
-                      <Badge className="bg-blue-600">+€5.00</Badge>
+                      <Badge className="bg-blue-600">+XAF 5.00</Badge>
                     )}
                   </div>
                   
@@ -285,7 +285,7 @@ export default function ConfiguratorPage() {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-3xl font-bold text-blue-600">€{calculatePrice().toFixed(2)}</span>
+                    <span className="text-3xl font-bold text-blue-600">XAF {calculatePrice().toFixed(2)}</span>
                     <span className="text-sm text-gray-500 ml-2">par unité</span>
                   </div>
                   <div className="flex space-x-2">
@@ -342,7 +342,7 @@ export default function ConfiguratorPage() {
                             <p className="text-xs text-center mt-1 font-medium">{color.name}</p>
                             {color.premium && (
                               <Badge className="absolute -top-1 -right-1 text-xs bg-orange-500">
-                                +€{color.price}
+                                +XAF {color.price}
                               </Badge>
                             )}
                           </div>
@@ -379,7 +379,7 @@ export default function ConfiguratorPage() {
                               )}
                               <p className="text-sm font-medium">{pattern.name}</p>
                               {pattern.price > 0 && (
-                                <p className="text-xs text-blue-600">+€{pattern.price}</p>
+                                <p className="text-xs text-blue-600">+XAF {pattern.price}</p>
                               )}
                             </div>
                           </div>
@@ -404,7 +404,7 @@ export default function ConfiguratorPage() {
                       />
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
                         <span>{customText.length}/20 caractères</span>
-                        {customText.trim() && <span className="text-blue-600">+€3.00</span>}
+                        {customText.trim() && <span className="text-blue-600">+XAF 3.00</span>}
                       </div>
                     </div>
                   </TabsContent>
@@ -426,7 +426,7 @@ export default function ConfiguratorPage() {
                             <div className="flex justify-between items-center">
                               <span className="font-medium">{size.name}</span>
                               {size.price > 0 && (
-                                <span className="text-blue-600">+€{size.price}</span>
+                                <span className="text-blue-600">+XAF {size.price}</span>
                               )}
                             </div>
                           </div>
@@ -447,41 +447,41 @@ export default function ConfiguratorPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Produit de base</span>
-                    <span>€{mockProduct.basePrice}</span>
+                    <span>XAF {mockProduct.basePrice}</span>
                   </div>
                   
                   {selectedColor.premium && (
                     <div className="flex justify-between">
                       <span>Couleur premium ({selectedColor.name})</span>
-                      <span>+€{selectedColor.price}</span>
+                      <span>+XAF {selectedColor.price}</span>
                     </div>
                   )}
                   
                   {selectedPattern.price > 0 && (
                     <div className="flex justify-between">
                       <span>Motif ({selectedPattern.name})</span>
-                      <span>+€{selectedPattern.price}</span>
+                      <span>+XAF {selectedPattern.price}</span>
                     </div>
                   )}
                   
                   {selectedSize.price > 0 && (
                     <div className="flex justify-between">
                       <span>Taille ({selectedSize.name})</span>
-                      <span>+€{selectedSize.price}</span>
+                      <span>+XAF {selectedSize.price}</span>
                     </div>
                   )}
                   
                   {customText.trim() && (
                     <div className="flex justify-between">
                       <span>Texte personnalisé</span>
-                      <span>+€3.00</span>
+                      <span>+XAF 3.00</span>
                     </div>
                   )}
                   
                   {uploadedImage && (
                     <div className="flex justify-between">
                       <span>Image personnalisée</span>
-                      <span>+€5.00</span>
+                      <span>+XAF 5.00</span>
                     </div>
                   )}
                 </div>
@@ -490,7 +490,7 @@ export default function ConfiguratorPage() {
 
                 <div className="flex justify-between items-center font-bold text-lg">
                   <span>Total</span>
-                  <span className="text-blue-600">€{calculatePrice().toFixed(2)}</span>
+                  <span className="text-blue-600">XAF {calculatePrice().toFixed(2)}</span>
                 </div>
 
                 <div className="flex items-center space-x-4">
@@ -522,7 +522,7 @@ export default function ConfiguratorPage() {
                     size="lg"
                   >
                     <ShoppingCart className="h-5 w-5 mr-2" />
-                    {isLoading ? 'Ajout en cours...' : `Ajouter au panier - €${(calculatePrice() * quantity).toFixed(2)}`}
+                    {isLoading ? 'Ajout en cours...' : `Ajouter au panier - XAF ${(calculatePrice() * quantity).toFixed(2)}`}
                   </Button>
                   
                   <Button

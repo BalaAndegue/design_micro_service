@@ -153,7 +153,7 @@ export const createProduct = async (product: Omit<Product, 'id' | 'createdAt' | 
 
 export const updateProduct = async (id: number, product: Partial<Omit<Product, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Product> => {
   try {
-    const res = await fetch(buildPublicApiUrl('vendor',`products/${id}`), {
+    const res = await fetch(buildApiUrl(`products/${id}`), {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(product),
@@ -168,7 +168,7 @@ export const updateProduct = async (id: number, product: Partial<Omit<Product, '
 
 export const deleteProduct = async (id: number): Promise<void> => {
   try {
-    const res = await fetch(buildPublicApiUrl('vendor',`products/${id}`), {
+    const res = await fetch(buildApiUrl(`products/${id}`), {
       method: 'DELETE',
       headers: getAuthHeaders(),
     });

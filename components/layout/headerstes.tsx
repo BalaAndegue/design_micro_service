@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   ShoppingCart,
   User,
-  Search,
+  
   Menu,
   X,
   Palette,
@@ -40,6 +40,7 @@ export function Header() {
     { name: 'Products', href: '/products' },
     { name: 'Configurator', href: '/configurator/1' },
     { name: 'About', href: '/about' },
+    
   ];
 
   // Gérer le scroll pour changer le style du header
@@ -223,6 +224,23 @@ export function Header() {
                   {item.name}
                 </Link>
               ))}
+              {/* Mobile Auth Buttons - Only show when user is NOT logged in */}
+              {!user && (
+                <>
+                  <div className="border-t pt-4 mt-2">
+                    <Link href="/auth/login" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="outline" className="w-full mb-2">
+                        Connexion
+                      </Button>
+                    </Link>
+                    <Link href="/auth/register" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600">
+                        S'inscrire
+                      </Button>
+                    </Link>
+                  </div>
+                </>
+              )}
             </nav>
           </div>
         )}

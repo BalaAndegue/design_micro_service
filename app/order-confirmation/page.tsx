@@ -116,14 +116,14 @@ export default function OrderConfirmationPage() {
                           ))}
                         </div>
                       </div>
-                      <span className="font-medium">€{(item.price * item.quantity).toFixed(2)}</span>
+                      <span className="font-medium">XAF {(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
 
                 <div className="flex justify-between items-center pt-4 border-t">
                   <span className="text-lg font-bold">Total:</span>
-                  <span className="text-lg font-bold text-blue-600">€{orderDetails.total}</span>
+                  <span className="text-lg font-bold text-blue-600">XAF {orderDetails.total}</span>
                 </div>
               </CardContent>
             </Card>

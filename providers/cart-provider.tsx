@@ -1,8 +1,8 @@
 // providers/cart-provider.tsx
 'use client';
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Cart, CartItem , CartItems} from '@/lib/types/cart';
-import { addToCart, updateCartItem, removeFromCart, clearCart, fetchCart } from '@/lib/api/card';
+import { CartItem } from '@/lib/types/cart';
+import { addToCart, updateCartItem, removeFromCart, clearCart as apiClearCart, fetchCart } from '@/lib/api/card';
 
 
 
@@ -35,7 +35,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
 // Calculate the total price
-const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
 
   // Charger le panier au démarrage
@@ -106,10 +106,10 @@ const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity
     }
   };
 
-  const clearCart = async () => {
+  const clearCartHandler = async () => {
     try {
       setIsLoading(true);
-      await clearCart();
+      await apiClearCart();
       setItems([]);
       setError(null);
     } catch (err) {
@@ -128,7 +128,7 @@ const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity
       updateItemQuantity,
       id: cardId,
       removeItem,
-      clearCart,
+      clearCart : clearCartHandler,
       totalPrice,    // Added
       totalItems,    // Adde
       isLoading,

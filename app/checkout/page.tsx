@@ -448,7 +448,7 @@ export default function CheckoutPage() {
                             <p className="text-sm text-gray-600">{method.description}</p>
                           </div>
                         </div>
-                        <span className="font-bold text-blue-600">€{method.price}</span>
+                        <span className="font-bold text-blue-600">XAF {method.price}</span>
                       </div>
                     </div>
                   ))}
@@ -606,7 +606,7 @@ export default function CheckoutPage() {
                       disabled={isProcessing || !acceptTerms}
                       className="flex-1 bg-gradient-to-r from-green-600 to-green-700"
                     >
-                      {isProcessing ? 'Traitement...' : `Payer €${totalWithShipping.toFixed(2)}`}
+                      {isProcessing ? 'Traitement...' : `Payer XAF ${totalWithShipping.toFixed(2)}`}
                     </Button>
                   </div>
                 </CardContent>

@@ -50,7 +50,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
           <div className="flex flex-col items-end">
             <div className="text-sm font-bold text-blue-600">XAF {product.price}</div>
             {product.originalPrice > product.price && (
-              <div className="text-xs text-gray-500 line-through">${product.originalPrice}</div>
+              <div className="text-xs text-gray-500 line-through">XAF {product.originalPrice}</div>
             )}
           </div>
         </div>
@@ -121,7 +121,7 @@ const CostumWorldLanding = () => {
       title: "Premium Membership",
       subtitle: "Get exclusive benefits & early access",
       image: "https://i.pinimg.com/1200x/a7/fd/9d/a7fd9d8233b50e293f20041dcc7d2741.jpg",
-      cta: "Shop Now"
+      cta: "Join Now"
     }
   ];
 

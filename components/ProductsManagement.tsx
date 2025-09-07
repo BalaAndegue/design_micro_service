@@ -99,7 +99,7 @@ export default function ProductsManagement({
       new: editingProduct.new,
       onSale: editingProduct.onSale,
       color: editingProduct.color,
-      sizes: editingProduct.sizes,
+      rating: editingProduct.rating,
       patterns: editingProduct.patterns,
     });
     
@@ -114,7 +114,7 @@ export default function ProductsManagement({
     }
   };
 
-  const handleArrayInput = (field: 'color' | 'sizes' | 'patterns', value: string, isEditing: boolean) => {
+  const handleArrayInput = (field: 'color' | 'patterns', value: string, isEditing: boolean) => {
     const values = value.split(',').map((v) => v.trim()).filter((v) => v);
     if (isEditing && editingProduct) {
       setEditingProduct({ ...editingProduct, [field]: values });
@@ -391,7 +391,7 @@ export default function ProductsManagement({
                   {product.category}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {product.price}€
+                  {product.price}XAF
                   {product.originalPrice > product.price && (
                     <span className="ml-2 text-sm text-gray-500 line-through">{product.originalPrice}€</span>
                   )}
@@ -511,10 +511,10 @@ export default function ProductsManagement({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tailles (séparées par des virgules)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">nombre d'etoile</label>
                   <input
-                    type="text"
-                    onChange={(e) => handleArrayInput('sizes', e.target.value, false)}
+                    type="number"
+                    onChange={(e) => setNewProduct({ ...newProduct, rating: Number(e.target.value )})}
                     className="w-full border border-gray-300 rounded-md px-3 py-2"
                   />
                 </div>
@@ -654,11 +654,11 @@ export default function ProductsManagement({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tailles (séparées par des virgules)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">nombre d'etoile</label>
                   <input
-                    type="text"
-                    value={editingProduct.sizes?.join(', ') || ''}
-                    onChange={(e) => handleArrayInput('sizes', e.target.value, true)}
+                    type="number"
+                    value={editingProduct.rating }
+                    onChange={(e) => setEditingProduct({ ...editingProduct, rating: Number(e.target.value ) || 0})}
                     className="w-full border border-gray-300 rounded-md px-3 py-2"
                   />
                 </div>

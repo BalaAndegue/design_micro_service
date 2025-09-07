@@ -37,6 +37,8 @@ export default function CartPage() {
     
     // Codes promo simulés
     const promoCodes = {
+
+
       'WELCOME10': 0.1,
       'SAVE20': 0.2,
       'FIRST15': 0.15
@@ -45,7 +47,7 @@ export default function CartPage() {
     if (promoCodes[promoCode as keyof typeof promoCodes]) {
       const discountAmount = totalPrice * promoCodes[promoCode as keyof typeof promoCodes];
       setDiscount(discountAmount);
-      toast.success(`Code promo appliqué ! -€${discountAmount.toFixed(2)}`);
+      toast.success(`Code promo appliqué ! -XAF ${discountAmount.toFixed(2)}`);
     } else {
       toast.error('Code promo invalide');
     }
@@ -235,7 +237,7 @@ export default function CartPage() {
 
                 <div className="flex justify-between items-center font-bold text-lg">
                   <span>Total</span>
-                  <span className="text-blue-600">€{finalTotal.toFixed(2)}</span>
+                  <span className="text-blue-600">XAF {finalTotal.toFixed(2)}</span>
                 </div>
 
                 <Link href="/checkout" className="block">
