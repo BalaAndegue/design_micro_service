@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { User } from '@/lib/types/user';
 import { Search, Filter, X } from 'lucide-react';
+import { UserRole } from '@/lib/api/users';
 
 interface UsersManagementProps {
   users: User[];
@@ -24,7 +25,7 @@ export default function UsersManagement({
     email: '',
     phone: '',
     password: '',
-    role: 'CUSTOMER',
+    role: UserRole.CUSTOMER,
   });
 
   // États pour les filtres
@@ -66,7 +67,7 @@ export default function UsersManagement({
         email: '',
         phone: '',
         password: '',
-        role: 'CUSTOMER',
+        role: UserRole.CUSTOMER,
       });
     }
   };
@@ -329,7 +330,7 @@ export default function UsersManagement({
                 <label className="block text-sm font-medium text-gray-700 mb-1">Rôle</label>
                 <select
                   value={newUser.role}
-                  onChange={(e) => setNewUser({ ...newUser, role: e.target.value as 'CUSTOMER' | 'ADMIN' | 'VENDOR' })}
+                  onChange={(e) => setNewUser({ ...newUser, role: e.target.value as UserRole.CUSTOMER | UserRole.VENDOR | UserRole.ADMIN })}
                   className="w-full border border-gray-300 rounded-md px-3 py-2"
                 >
                   <option value="CUSTOMER">Client</option>
@@ -402,7 +403,7 @@ export default function UsersManagement({
                 <label className="block text-sm font-medium text-gray-700 mb-1">Rôle</label>
                 <select
                   value={editingUser.role}
-                  onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value as 'CUSTOMER' | 'ADMIN' | 'VENDOR' })}
+                  onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value as UserRole.CUSTOMER | UserRole.ADMIN | UserRole.VENDOR })}
                   className="w-full border border-gray-300 rounded-md px-3 py-2"
                 >
                   <option value="CUSTOMER">Client</option>

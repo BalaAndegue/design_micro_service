@@ -3,7 +3,7 @@
 export enum UserRole {
   CUSTOMER = 'CUSTOMER',
   ADMIN = 'ADMIN',
-  MODERATOR = 'MODERATOR',
+  VENDOR = 'VENDOR',
   // Ajoutez d'autres rôles si nécessaire
 }
 
