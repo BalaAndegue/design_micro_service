@@ -7,6 +7,11 @@ interface User {
   email: string;
   name: string;
   avatar?: string;
+  phone?:string,
+  address?:string,
+  city?:string,
+  country?:string,
+  postalCode?:string
 }
 
 interface AuthContextType {

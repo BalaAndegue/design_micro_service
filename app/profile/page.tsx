@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,83 +12,166 @@ import {
   Mail, 
   Phone, 
   MapPin, 
-  Bell, 
-  Shield, 
-  CreditCard,
-  Camera,
-  Save,
-  Heart,
   Package,
-  Star
+  Save,
+  Key,
+  Loader2
 } from 'lucide-react';
 import { Header } from '@/components/layout/headerstes';
 import { Footer } from '@/components/layout/footer';
 import { useAuth } from '@/providers/auth-provider';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { fetchOrders } from '@/lib/api/orders';
+import { resetPasswordRequest} from '@/lib/api/auth';
+import { updateProfile } from '@/lib/api/profile';
 
+// Schéma pour la demande de changement de mot de passe
+const changePasswordSchema = z.object({
+  email: z.string().email('Email invalide'),
+});
+
+type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
+
+// Schéma pour la mise à jour du profil
+const profileSchema = z.object({
+  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
+  email: z.string().email('Email invalide'),
+  tel: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  postalCode: z.string().optional(),
+  country: z.string().optional(),
+});
+
+type ProfileFormData = z.infer<typeof profileSchema>;
+
+interface Order {
+  id: number;
+  customerId: number;
+  productId: number;
+  deliveryAddress: string;
+  status: 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+  orderDate: string;
+  amount: number;
+  currency: string;
+  transactionId: string;
+}
 
 export default function ProfilePage() {
   const { user } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
-  const [profileData, setProfileData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: '+237 6 56 61 67 51',
-    address: '123 Rue de Melen',
-    city: 'Paris',
-    postalCode: '75001',
-    country: 'France'
+  const [isLoading, setIsLoading] = useState(false);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+  // Formulaire pour le changement de mot de passe
+  const passwordForm = useForm<ChangePasswordFormData>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: {
+      email: user?.email || '',
+    },
   });
 
-  const handleSave = async () => {
-    // Simulation de sauvegarde
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsEditing(false);
-    toast.success('Profil mis à jour avec succès !');
+  // Formulaire pour la mise à jour du profil
+  const profileForm = useForm<ProfileFormData>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      name: user?.name || '',
+      email: user?.email || '',
+      tel: user?.phone || '',
+      address: user?.address || '',
+      city: user?.city || '',
+      postalCode: user?.postalCode || '',
+      country: user?.country || '',
+    },
+  });
+
+  // Charger les commandes depuis le backend
+  useEffect(() => {
+    if (user) {
+      loadOrders();
+    }
+  }, [user]);
+
+  const loadOrders = async () => {
+    try {
+      setIsLoading(true);
+      const ordersData = await fetchOrders();
+      setOrders(ordersData);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      toast.error('Erreur lors du chargement des commandes');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const favoriteProducts = [
-    {
-      id: 1,
-      name: 'Coque iPhone 15 Pro',
-      image: 'https://images.pexels.com/photos/607812/pexels-photo-607812.jpeg?auto=compress&cs=tinysrgb&w=200',
-      price: 24.99
-    },
-    {
-      id: 2,
-      name: 'T-Shirt Premium',
-      image: 'https://images.pexels.com/photos/1020585/pexels-photo-1020585.jpeg?auto=compress&cs=tinysrgb&w=200',
-      price: 29.99
+  const handleProfileUpdate = async (data: ProfileFormData) => {
+    try {
+      setIsLoading(true);
+      await updateProfile(data);
+      toast.success('Profil mis à jour avec succès !');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Erreur lors de la mise à jour du profil');
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
 
-  const recentOrders = [
-    {
-      id: 'CMD-123456',
-      date: '2025-01-15',
-      total: 54.98,
-      status: 'delivered'
-    },
-    {
-      id: 'CMD-123455',
-      date: '2025-01-10',
-      total: 29.99,
-      status: 'shipped'
+  const handleChangePassword = async (data: ChangePasswordFormData) => {
+    try {
+      setIsChangingPassword(true);
+      await resetPasswordRequest(data.email);
+      toast.success('Email de réinitialisation envoyé ! Vérifiez votre boîte mail.');
+      passwordForm.reset();
+    } catch (error) {
+      console.error('Error requesting password reset:', error);
+      toast.error(error instanceof Error ? error.message : 'Erreur lors de l\'envoi de l\'email');
+    } finally {
+      setIsChangingPassword(false);
     }
-  ];
+  };
+
+  const getStatusDisplay = (status: string) => {
+    switch (status) {
+      case 'PENDING':
+        return { text: 'En attente', color: 'bg-yellow-100 text-yellow-800' };
+      case 'PROCESSING':
+        return { text: 'En traitement', color: 'bg-blue-100 text-blue-800' };
+      case 'SHIPPED':
+        return { text: 'Expédié', color: 'bg-purple-100 text-purple-800' };
+      case 'DELIVERED':
+        return { text: 'Livré', color: 'bg-green-100 text-green-800' };
+      case 'CANCELLED':
+        return { text: 'Annulé', color: 'bg-red-100 text-red-800' };
+      default:
+        return { text: status, color: 'bg-gray-100 text-gray-800' };
+    }
+  };
 
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 ">
+          <div className="text-center ">
             <User className="h-24 w-24 text-gray-300 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Connectez-vous pour voir votre profil</h1>
-            <p className="text-gray-600 mb-8">Accédez à vos informations personnelles et vos préférences</p>
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-blue-700">
-              Se connecter
+            <p className="text-gray-600 mb-8">Accédez à vos informations personnelles et vos commandes</p>
+            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-blue-700" asChild>
+              <Link href="/auth/login">Se connecter</Link>
             </Button>
           </div>
         </div>
@@ -102,9 +185,9 @@ export default function ProfilePage() {
       <Header />
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
+        <div className="mb-8 mt-12">
           <h1 className="text-3xl font-bold text-gray-900">Mon Profil</h1>
-          <p className="text-gray-600">Gérez vos informations personnelles et vos préférences</p>
+          <p className="text-gray-600">Gérez vos informations personnelles et vos commandes</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -117,24 +200,13 @@ export default function ProfilePage() {
                     <AvatarImage src={user.avatar} alt={user.name} />
                     <AvatarFallback className="text-2xl">{user.name.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="absolute bottom-0 right-1/2 transform translate-x-1/2 translate-y-1/2"
-                  >
-                    <Camera className="h-3 w-3" />
-                  </Button>
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">{user.name}</h2>
                 <p className="text-gray-600">{user.email}</p>
                 <div className="mt-4 flex justify-center space-x-2">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">12</div>
+                    <div className="text-2xl font-bold text-blue-600">{orders.length}</div>
                     <div className="text-xs text-gray-600">Commandes</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">4.8</div>
-                    <div className="text-xs text-gray-600">Satisfaction</div>
                   </div>
                 </div>
               </CardContent>
@@ -144,106 +216,183 @@ export default function ProfilePage() {
           {/* Contenu principal */}
           <div className="lg:col-span-3">
             <Tabs defaultValue="profile" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="profile">Profil</TabsTrigger>
                 <TabsTrigger value="orders">Commandes</TabsTrigger>
-                <TabsTrigger value="favorites">Favoris</TabsTrigger>
-                <TabsTrigger value="settings">Paramètres</TabsTrigger>
               </TabsList>
 
               <TabsContent value="profile" className="space-y-6">
+                {/* Informations personnelles */}
                 <Card>
-                  <CardHeader className="flex flex-row items-center justify-between">
+                  <CardHeader>
                     <CardTitle className="flex items-center">
                       <User className="h-5 w-5 mr-2" />
                       Informations personnelles
                     </CardTitle>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsEditing(!isEditing)}
-                    >
-                      {isEditing ? 'Annuler' : 'Modifier'}
-                    </Button>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="name">Nom complet</Label>
-                        <Input
-                          id="name"
-                          value={profileData.name}
-                          onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
-                          disabled={!isEditing}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={profileData.email}
-                          onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                          disabled={!isEditing}
-                        />
-                      </div>
-                    </div>
+                  <CardContent>
+                    <Form {...profileForm}>
+                      <form onSubmit={profileForm.handleSubmit(handleProfileUpdate)} className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={profileForm.control}
+                            name="name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Nom complet</FormLabel>
+                                <FormControl>
+                                  <Input {...field} disabled={isLoading} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={profileForm.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                  <Input type="email" {...field} disabled={isLoading} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
 
-                    <div>
-                      <Label htmlFor="phone">Téléphone</Label>
-                      <Input
-                        id="phone"
-                        value={profileData.phone}
-                        onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
-                        disabled={!isEditing}
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="address">Adresse</Label>
-                      <Input
-                        id="address"
-                        value={profileData.address}
-                        onChange={(e) => setProfileData({ ...profileData, address: e.target.value })}
-                        disabled={!isEditing}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <Label htmlFor="city">Ville</Label>
-                        <Input
-                          id="city"
-                          value={profileData.city}
-                          onChange={(e) => setProfileData({ ...profileData, city: e.target.value })}
-                          disabled={!isEditing}
+                        <FormField
+                          control={profileForm.control}
+                          name="tel"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Téléphone</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={isLoading} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
-                      </div>
-                      <div>
-                        <Label htmlFor="postalCode">Code postal</Label>
-                        <Input
-                          id="postalCode"
-                          value={profileData.postalCode}
-                          onChange={(e) => setProfileData({ ...profileData, postalCode: e.target.value })}
-                          disabled={!isEditing}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="country">Pays</Label>
-                        <Input
-                          id="country"
-                          value={profileData.country}
-                          onChange={(e) => setProfileData({ ...profileData, country: e.target.value })}
-                          disabled={!isEditing}
-                        />
-                      </div>
-                    </div>
 
-                    {isEditing && (
-                      <Button onClick={handleSave} className="w-full md:w-auto">
-                        <Save className="h-4 w-4 mr-2" />
-                        Sauvegarder les modifications
-                      </Button>
-                    )}
+                        <FormField
+                          control={profileForm.control}
+                          name="address"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Adresse</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={isLoading} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <FormField
+                            control={profileForm.control}
+                            name="city"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Ville</FormLabel>
+                                <FormControl>
+                                  <Input {...field} disabled={isLoading} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={profileForm.control}
+                            name="postalCode"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Code postal</FormLabel>
+                                <FormControl>
+                                  <Input {...field} disabled={isLoading} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={profileForm.control}
+                            name="country"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Pays</FormLabel>
+                                <FormControl>
+                                  <Input {...field} disabled={isLoading} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <Button type="submit" disabled={isLoading}>
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Sauvegarde...
+                            </>
+                          ) : (
+                            <>
+                              <Save className="h-4 w-4 mr-2" />
+                              Sauvegarder les modifications
+                            </>
+                          )}
+                        </Button>
+                      </form>
+                    </Form>
+                  </CardContent>
+                </Card>
+
+                {/* Changement de mot de passe */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Key className="h-5 w-5 mr-2" />
+                      Changer le mot de passe
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Form {...passwordForm}>
+                      <form onSubmit={passwordForm.handleSubmit(handleChangePassword)} className="space-y-4">
+                        <FormField
+                          control={passwordForm.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email pour la réinitialisation</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="email"
+                                  {...field}
+                                  disabled={isChangingPassword}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button type="submit" disabled={isChangingPassword}>
+                          {isChangingPassword ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Envoi en cours...
+                            </>
+                          ) : (
+                            'Envoyer le lien de réinitialisation'
+                          )}
+                        </Button>
+                      </form>
+                    </Form>
+                    <p className="text-sm text-gray-600 mt-2">
+                      Un lien de réinitialisation sera envoyé à votre adresse email.
+                    </p>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -253,106 +402,59 @@ export default function ProfilePage() {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <Package className="h-5 w-5 mr-2" />
-                      Commandes récentes
+                      Mes Commandes
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {recentOrders.map((order) => (
-                        <div key={order.id} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                          <div>
-                            <h4 className="font-medium">{order.id}</h4>
-                            <p className="text-sm text-gray-600">{order.date}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-bold text-blue-600">XAF {order.total}</p>
-                            <span className={`text-xs px-2 py-1 rounded-full ${
-                              order.status === 'delivered' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-                            }`}>
-                              {order.status === 'delivered' ? 'Livré' : 'Expédié'}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <Button className="w-full mt-4" variant="outline" asChild>
-                      <Link href="/orders">Voir toutes les commandes</Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="favorites" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Heart className="h-5 w-5 mr-2" />
-                      Produits favoris
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {favoriteProducts.map((product) => (
-                        <div key={product.id} className="flex gap-3 p-3 bg-gray-50 rounded-lg">
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-16 h-16 object-cover rounded-lg"
-                          />
-                          <div className="flex-1">
-                            <h4 className="font-medium">{product.name}</h4>
-                            <p className="text-blue-600 font-bold">XAF {product.price}</p>
-                            <Button size="sm" className="mt-2">
-                              Personnaliser
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="settings" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Bell className="h-5 w-5 mr-2" />
-                      Notifications
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium">Nouvelles commandes</h4>
-                        <p className="text-sm text-gray-600">Recevoir des emails pour les mises à jour de commande</p>
+                    {isLoading ? (
+                      <div className="text-center py-8">
+                        <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-600" />
+                        <p className="text-gray-600 mt-2">Chargement des commandes...</p>
                       </div>
-                      <input type="checkbox" defaultChecked className="rounded" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium">Promotions</h4>
-                        <p className="text-sm text-gray-600">Recevoir des offres spéciales et des codes promo</p>
+                    ) : orders.length === 0 ? (
+                      <div className="text-center py-8">
+                        <Package className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune commande</h3>
+                        <p className="text-gray-600 mb-4">Vous n'avez pas encore passé de commande.</p>
+                        <Button asChild>
+                          <Link href="/products">Découvrir nos produits</Link>
+                        </Button>
                       </div>
-                      <input type="checkbox" defaultChecked className="rounded" />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Shield className="h-5 w-5 mr-2" />
-                      Sécurité
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <Button variant="outline" className="w-full justify-start">
-                      Changer le mot de passe
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start">
-                      Activer l'authentification à deux facteurs
-                    </Button>
+                    ) : (
+                      <div className="space-y-4">
+                        {orders.map((order) => {
+                          const statusInfo = getStatusDisplay(order.status);
+                          return (
+                            <div key={order.id} className="border rounded-lg p-4">
+                              <div className="flex justify-between items-start mb-3">
+                                <div>
+                                  <h4 className="font-medium">Commande #{order.id}</h4>
+                                  <p className="text-sm text-gray-600">
+                                    Passée le {new Date(order.orderDate).toLocaleDateString('fr-FR')}
+                                  </p>
+                                  <p className="text-sm text-gray-600">
+                                    Adresse: {order.deliveryAddress}
+                                  </p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="font-bold text-blue-600">
+                                    {order.amount} {order.currency}
+                                  </p>
+                                  <span className={`text-xs px-2 py-1 rounded-full ${statusInfo.color}`}>
+                                    {statusInfo.text}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="border-t pt-3">
+                                <p className="text-sm text-gray-600">
+                                  Transaction: {order.transactionId || 'N/A'}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
