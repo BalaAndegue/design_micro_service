@@ -90,11 +90,12 @@ const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity
     }
   };
 
-  const removeItem = async (productId: number) => {
+  const removeItem = async (cartItemId: number) => {
     try {
       setIsLoading(true);
-      const updatedCart = await removeFromCart(productId);
+      const updatedCart = await removeFromCart(cartItemId);
       setItems(updatedCart.items);
+      setCardId(updatedCart.id)
       setError(null);
     } catch (err) {
       setError('Erreur lors de la suppression de l\'article');

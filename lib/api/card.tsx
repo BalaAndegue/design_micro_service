@@ -68,9 +68,9 @@ export const updateCartItem = async (cartItemId: number, quantity: number): Prom
 };
 
 // Supprimer un article du panier
-export const removeFromCart = async (productId: number): Promise<Cart> => {
+export const removeFromCart = async (cartItemId: number): Promise<Cart> => {
   try {
-    const res = await fetch(`${API_URL}/customer/cart/remove/${productId}`, {
+    const res = await fetch(`${API_URL}/customer/cart/remove/${cartItemId}`, {
       method: 'DELETE',
       headers: getAuthHeaders(),
     });

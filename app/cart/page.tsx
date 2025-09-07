@@ -203,7 +203,7 @@ export default function CartPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Sous-total ({totalItems} articles)</span>
-                    <span>€{totalPrice.toFixed(2)}</span>
+                    <span>XAF {totalPrice.toFixed(2)}</span>
                   </div>
                   
                   {discount > 0 && (
@@ -219,7 +219,7 @@ export default function CartPage() {
                       {shippingCost === 0 ? (
                         <span className="text-green-600">Gratuite</span>
                       ) : (
-                        `€${shippingCost.toFixed(2)}`
+                        `XAF ${shippingCost.toFixed(2)}`
                       )}
                     </span>
                   </div>

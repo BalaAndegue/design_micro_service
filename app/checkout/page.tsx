@@ -459,7 +459,7 @@ export default function CheckoutPage() {
                       Retour
                     </Button>
                     <Button onClick={handleNext} className="flex-1">
-                      Continuer vers le paiement
+                      Continuer 
                     </Button>
                   </div>
                 </CardContent>
