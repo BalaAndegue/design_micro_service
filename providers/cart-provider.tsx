@@ -2,7 +2,7 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CartItem } from '@/lib/types/cart';
-import { addToCart, updateCartItem, removeFromCart, clearCart as apiClearCart, fetchCart } from '@/lib/api/card';
+import { addToCart, updateCartItem, removeFromCart, clearCart as apiClearCart, fetchCart, AuthenticationError } from '@/lib/api/card';
 
 
 
@@ -13,7 +13,8 @@ interface CartContextType {
   updateItemQuantity: (productId: number, quantity: number) => Promise<void>;
   removeItem: (productId: number) => Promise<void>;
   clearCart: () => Promise<void>;
- 
+  authError:boolean;
+  resetAuthError : () => void;
   totalPrice: number;
   totalItems: number;
   isLoading: boolean;
@@ -36,6 +37,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
 // Calculate the total price
   const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const [authError, setAuthError] = useState<boolean>(false); // Nouvel état pour les erreurs d'authentification
 
 
   // Charger le panier au démarrage
@@ -66,7 +68,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setCardId(updatedCart.id)
       setError(null);
     } catch (err) {
-      setError('Erreur lors de l\'ajout au panier');
+       if (err instanceof AuthenticationError) {
+        setAuthError(true); // Définir l'état d'erreur d'authentification
+        setError('Veuillez vous connecter pour ajouter des articles au panier');
+      } else {
+        setError('Erreur lors de l\'ajout au panier');
+      }
       console.error('Error adding item:', err);
       throw err;
     } finally {
@@ -132,7 +139,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       totalPrice,    // Added
       totalItems,    // Adde
       isLoading,
-      error
+      error,
+      authError,
+      resetAuthError : () =>setAuthError(false),
     }}>
       {children}
     </CartContext.Provider>

@@ -10,6 +10,18 @@ export const getAuthHeaders = () => {
   return headers;
 };
 
+
+
+export class AuthenticationError extends Error {
+  constructor(
+    message: string,
+    public statusCode: number = 401
+  ) {
+    super(message);
+    this.name = 'AuthenticationError';
+  }
+}
+
 // Récupérer le panier de l'utilisateur
 export const fetchCart = async (): Promise<Cart> => {
   try {
@@ -38,15 +50,32 @@ export const addToCart = async (productId: number, quantity: number): Promise<Ca
       headers: getAuthHeaders(),
     });
 
+
+
+    // Vérifier spécifiquement le statut 401
+    if (res.status === 401) {
+      const errorData = await res.json();
+      throw new AuthenticationError(
+        errorData.message || 'Accès refusé : authentification requise.',
+        res.status
+      );
+    }
+
     if (!res.ok) {
       throw new Error(`Failed to add item to cart: ${res.status} ${res.statusText}`);
     }
 
+    
     // 3. Retourner la réponse du panier mis à jour
     return res.json();
 
   } catch (error) {
     console.error('Error adding item to cart:', error);
+    // Si c'est une erreur d'authentification, relancez-la spécifiquement
+    if (error instanceof AuthenticationError) {
+      throw error;
+    }
+    
     throw new Error('Unable to add item to cart.');
   }
 };
