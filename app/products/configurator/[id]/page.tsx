@@ -25,7 +25,7 @@ import {
   Watch,
   Laptop
 } from 'lucide-react';
-import { Header } from '@/components/layout/header';
+import { Header } from '@/components/layout/headerstes';
 import { useCart } from '@/providers/cart-provider';
 import { toast } from 'sonner';
 import { useParams } from 'next/navigation';
