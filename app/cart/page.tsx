@@ -28,7 +28,7 @@ export default function CartPage() {
   const [discount, setDiscount] = useState(0);
   const [isCheckingPromo, setIsCheckingPromo] = useState(false);
 
-  const shippingCost = totalPrice > 50 ? 0 : 4.99;
+  const shippingCost = totalPrice > 20000 ? 0 : 1500;
   const finalTotal = totalPrice - discount + shippingCost;
 
   const handlePromoCode = async () => {
@@ -226,9 +226,9 @@ export default function CartPage() {
                     </span>
                   </div>
                   
-                  {totalPrice < 50 && (
+                  {totalPrice < 20000 && (
                     <p className="text-xs text-blue-600">
-                      Livraison gratuite dès XAF 50 d'achat !
+                      Livraison gratuite dès XAF 2000 d'achat !
                     </p>
                   )}
                 </div>

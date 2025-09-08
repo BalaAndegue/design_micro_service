@@ -79,6 +79,51 @@ export const addToCart = async (productId: number, quantity: number): Promise<Ca
     throw new Error('Unable to add item to cart.');
   }
 };
+
+
+
+
+// Ajouter un article au panier
+export const addToCartcustomized = async (productId: number, quantity: number,isCutomized :boolean): Promise<Cart> => {
+  try {
+    // 1. Construire l'URL avec les paramètres de requête
+    const url = `${API_URL}/customer/cart/add?productId=${productId}&quantity=${quantity}&isCustomized=${isCutomized}`;
+
+    // 2. Faire la requête POST avec une URL modifiée
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+
+
+
+    // Vérifier spécifiquement le statut 401
+    if (res.status === 401) {
+      const errorData = await res.json();
+      throw new AuthenticationError(
+        errorData.message || 'Accès refusé : authentification requise.',
+        res.status
+      );
+    }
+
+    if (!res.ok) {
+      throw new Error(`Failed to add item to cart: ${res.status} ${res.statusText}`);
+    }
+
+    
+    // 3. Retourner la réponse du panier mis à jour
+    return res.json();
+
+  } catch (error) {
+    console.error('Error adding item to cart:', error);
+    // Si c'est une erreur d'authentification, relancez-la spécifiquement
+    if (error instanceof AuthenticationError) {
+      throw error;
+    }
+    
+    throw new Error('Unable to add item to cart.');
+  }
+};
 // Mettre à jour la quantité d'un article     `${API_URL}/customer/cart/update/${cartItemId}?quantity=${newQuantity}
 
 export const updateCartItem = async (cartItemId: number, quantity: number): Promise<Cart> => {

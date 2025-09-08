@@ -106,7 +106,7 @@ const fontOptions = [
 
 export default function ConfiguratorPage() {
   const params = useParams();
-  const { addItem, authError } = useCart();
+  const { addItemcustom, authError } = useCart();
   const { user } = useAuth();
   const [product, setProduct] = useState<Product>({
     id: 0,
@@ -207,7 +207,7 @@ export default function ConfiguratorPage() {
     try {
       setIsAdding(true);
       
-      await addItem({
+      await addItemcustom({
         id: product.id,
         productId: product.id,
         productName: product.name,

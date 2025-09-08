@@ -2,7 +2,7 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CartItem } from '@/lib/types/cart';
-import { addToCart, updateCartItem, removeFromCart, clearCart as apiClearCart, fetchCart, AuthenticationError } from '@/lib/api/card';
+import { addToCart, updateCartItem, removeFromCart, clearCart as apiClearCart, fetchCart, AuthenticationError, addToCartcustomized } from '@/lib/api/card';
 
 
 
@@ -10,6 +10,7 @@ interface CartContextType {
   id?: number;
   items: CartItem[];
   addItem: (item: CartItem) => Promise<void>;
+  addItemcustom: (item: CartItem) => Promise<void>;
   updateItemQuantity: (productId: number, quantity: number) => Promise<void>;
   removeItem: (productId: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -81,6 +82,29 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+
+
+  const addItemcustom = async (items : CartItem) => {
+    try {
+      setIsLoading(true);
+      const updatedCart = await addToCartcustomized(items.id, items.quantity,true);
+      setItems(updatedCart.items);
+      setCardId(updatedCart.id)
+      setError(null);
+    } catch (err) {
+       if (err instanceof AuthenticationError) {
+        setAuthError(true); // Définir l'état d'erreur d'authentification
+        setError('Veuillez vous connecter pour ajouter des articles au panier');
+      } else {
+        setError('Erreur lors de l\'ajout au panier');
+      }
+      console.error('Error adding item:', err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const updateItemQuantity = async (cartItemId: number, quantity: number) => {
     try {
       setIsLoading(true);
@@ -132,6 +156,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     <CartContext.Provider value={{
       items,
       addItem,
+      addItemcustom,
       updateItemQuantity,
       id: cardId,
       removeItem,

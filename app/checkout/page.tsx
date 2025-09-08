@@ -38,23 +38,23 @@ import {
 const shippingMethods = [
   {
     id: 'standard',
-    name: 'Livraison Standard',
-    description: '5-7 jours ouvrés',
-    price: 4.99,
+    name: 'Sans livraison',
+    description: 'selon votre disponibilite',
+    price: 0,
     icon: Truck
   },
   {
     id: 'express',
     name: 'Livraison Express',
     description: '2-3 jours ouvrés',
-    price: 9.99,
+    price: 1500,
     icon: Truck
   },
   {
     id: 'premium',
     name: 'Livraison Premium',
     description: '24-48h',
-    price: 14.99,
+    price: 3000,
     icon: Truck
   }
 ];
@@ -382,6 +382,7 @@ export default function CheckoutPage() {
                         value={formData.postalCode}
                         onChange={(e) => handleInputChange('postalCode', e.target.value)}
                         required
+                        placeholder="ex : 0000"
                       />
                     </div>
                     <div>
