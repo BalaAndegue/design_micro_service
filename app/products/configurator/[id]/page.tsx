@@ -27,17 +27,17 @@ import { toast } from 'sonner';
 import { useParams } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const mockProduct = {
-  id: 1,
-  name: 'Coque iPhone 15 Pro',
-  category: 'coques',
-  originalPrice: 24.99,
-  
-  description: 'Coque de protection premium pour iPhone 15 Pro',
-  image: 'https://images.pexels.com/photos/607812/pexels-photo-607812.jpeg?auto=compress&cs=tinysrgb&w=600',
-  rating: 4.8,
-  reviews: 156
-};
+
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/auth-provider';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+
 
 const colorOptions = [
   { name: 'Noir', value: '#000000', premium: false },
@@ -67,7 +67,7 @@ const sizeOptions = [
 
 export default function ConfiguratorPage() {
   const params = useParams();
-  const { addItem } = useCart();
+  const { addItem ,authError} = useCart();
   
   const [product, setProduct] = useState<Product>({
     id: 0,
@@ -89,6 +89,12 @@ export default function ConfiguratorPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const { user } = useAuth();
+  const router = useRouter();
+
+  
 
   const calculatePrice = (): number => {
   return [
@@ -117,34 +123,72 @@ export default function ConfiguratorPage() {
     }
   };
 
-  const handleAddToCart = async () => {
-    console.log('message produit ajouté au panier:', product.name);
-    setIsLoading(true);
-    
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    addItem({
-      id:product.id,
-      productId: product.id,
-      productName: product.name ,
-      price: calculatePrice(),
-      quantity,
-      imagePath: uploadedImage || product?.imagePath || '',
-      customizations: {
-        color: selectedColor.name,
-        pattern: selectedPattern.name,
-        text: customText || undefined,
-        size: selectedSize.name,
-        customImage: uploadedImage ? true : undefined
-      }
-    });
 
-    toast.success('Produit ajouté au panier !', {
+
+  const handleAddToCart = async () => {
+      // Si l'utilisateur n'est pas connecté, afficher le dialogue de connexion
+      if (!user) {
+        setShowLoginDialog(true);
+        return;
+      }
+  
+      try {
+        setIsAdding(true);
+        
+        await addItem({
+          id: product.id,
+          productId: product.id,
+          productName: product.name,
+          price: product.price,
+          quantity: 1,
+          imagePath: uploadedImage || product?.imagePath || '',
+          customizations: {
+            color: selectedColor.name,
+            pattern: selectedPattern.name,
+            text: customText || undefined,
+            size: selectedSize.name,
+            customImage: uploadedImage ? true : undefined
+          }
+        });
+        
+        toast.success('Produit ajouté au panier !', {
       description: `${quantity} x ${product.name} personnalisé`
     });
-    
     setIsLoading(false);
+      } catch (error) {
+        console.error('Error adding to cart:', error);
+        
+        // Si l'erreur est une erreur d'authentification, afficher le dialogue
+        if (error instanceof Error && error.message.includes('authentification')) {
+          setShowLoginDialog(true);
+        } else {
+          toast.error('Erreur lors de l\'ajout au panier');
+        }
+      } finally {
+        setIsAdding(false);
+      }
+    };
+
+
+
+    // Écouter les changements d'erreur d'authentification du panier
+  useEffect(() => {
+    if (authError) {
+      setShowLoginDialog(true);
+    }
+  }, [authError]);
+
+  const handleLogin = () => {
+    setShowLoginDialog(false);
+    router.push('/auth/login');
   };
+
+  const handleRegister = () => {
+    setShowLoginDialog(false);
+    router.push('/auth/register');
+  };
+
+  
 
   const resetConfiguration = () => {
     setSelectedColor(colorOptions[0]);
@@ -621,6 +665,35 @@ export default function ConfiguratorPage() {
           </div>
         </div>
       </div>
+      {/* Dialogue de connexion */}
+      <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Connexion requise</DialogTitle>
+            <DialogDescription>
+              Vous devez être connecté pour ajouter des articles au panier.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex flex-col space-y-3 mt-4">
+            <Button onClick={handleLogin} className="w-full">
+              Se connecter
+            </Button>
+            
+            <Button onClick={handleRegister} variant="outline" className="w-full">
+              Créer un compte
+            </Button>
+            
+            <Button 
+              variant="ghost" 
+              className="w-full" 
+              onClick={() => setShowLoginDialog(false)}
+            >
+              Continuer sans se connecter
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
