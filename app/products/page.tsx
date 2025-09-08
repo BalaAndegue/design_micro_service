@@ -14,6 +14,7 @@ import { ProductCard } from '@/components/products/ProductCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ProductCardSkeleton } from '@/components/products/ProductCardSkeleton';
 import { useRouter, useSearchParams } from 'next/navigation';
+import FloatingCart from '@/components/FloatingCart';
 
 const sortOptions = [
   { value: 'popular', label: 'Plus populaires' },
@@ -249,6 +250,7 @@ export default function ProductsPage() {
       </div>
 
       <Footer />
+      <FloatingCart/>
     </div>
   );
 }

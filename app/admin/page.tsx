@@ -11,6 +11,7 @@ import UsersManagement from '@/components/UsersManagement';
 import DashboardStats from '@/components/DashboardStats';
 import Link from 'next/link';
 import { Home, Menu, Bell, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 export interface Stats {
   totalProducts: number;
@@ -115,11 +116,15 @@ export default function AdminDashboard() {
 
   const handleUpdateUser = async (id: number, newRole: UserRole) => {
     try {
-      const updated = await updateUser(id, newRole);
+      // Correction: Passer un objet Partial<User> au lieu de juste le rôle
+      const updateData: Partial<User> = { role: newRole };
+      const updated = await updateUser(id, updateData);
       setUsers(users.map((u) => (u.id === updated.id ? updated : u)));
+      toast.success('Rôle utilisateur mis à jour');
       return { success: true };
     } catch (err) {
       setError('Échec de la mise à jour de l\'utilisateur');
+      toast.error('Erreur lors de la mise à jour du rôle');
       return { success: false, error: 'Échec de la mise à jour de l\'utilisateur' };
     }
   };

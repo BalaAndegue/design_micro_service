@@ -21,6 +21,7 @@ import { Header } from '@/components/layout/headerstes';
 import { Footer } from '@/components/layout/footer';
 import { useAuth } from '@/providers/auth-provider';
 import Link from 'next/link';
+import FloatingCart from '@/components/FloatingCart';
 
 const mockOrders = [
   {
@@ -275,6 +276,7 @@ export default function OrdersPage() {
       </div>
 
       <Footer />
+      <FloatingCart/>
     </div>
   );
 }

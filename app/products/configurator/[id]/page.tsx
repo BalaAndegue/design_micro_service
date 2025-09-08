@@ -40,6 +40,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import FloatingCart from '@/components/FloatingCart';
 
 // Modèles de produits par catégorie
 const productModels = {
@@ -758,6 +759,7 @@ ${additionalNotes ? `\n*Notes supplémentaires:*\n${additionalNotes}` : ''}
           </div>
         </DialogContent>
       </Dialog>
+      <FloatingCart/>
     </div>
   );
 }

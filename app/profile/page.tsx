@@ -36,6 +36,7 @@ import {
 import { fetchOrders } from '@/lib/api/orders';
 import { resetPasswordRequest} from '@/lib/api/auth';
 import { updateProfile } from '@/lib/api/profile';
+import FloatingCart from '@/components/FloatingCart';
 
 // Schéma pour la demande de changement de mot de passe
 const changePasswordSchema = z.object({
@@ -464,6 +465,7 @@ export default function ProfilePage() {
       </div>
 
       <Footer />
+      <FloatingCart/>
     </div>
   );
 }
