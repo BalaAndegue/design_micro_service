@@ -8,7 +8,7 @@ import { UserRole } from '@/lib/api/users';
 interface UsersManagementProps {
   users: User[];
   onCreateUser: (user: Omit<User, 'id' | 'createdAt'>) => Promise<{ success: boolean; error?: string }>;
-  onUpdateUser: (id: number, user: Partial<User>) => Promise<{ success: boolean; error?: string }>;
+  onUpdateUser: (id: number, newRole:UserRole) => Promise<{ success: boolean; error?: string }>;
   onDeleteUser: (id: number) => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -76,11 +76,10 @@ export default function UsersManagement({
     e.preventDefault();
     if (!editingUser) return;
     
-    const result = await onUpdateUser(editingUser.id, {
-      name: editingUser.name,
-      email: editingUser.email,
-      role: editingUser.role,
-    });
+    const result = await onUpdateUser(editingUser.id, 
+      
+      editingUser.role,
+    );
     
     if (result.success) {
       setEditingUser(null);
@@ -363,7 +362,10 @@ export default function UsersManagement({
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
           <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full">
             <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="text-xl font-semibold text-gray-900">Modifier l'utilisateur</h3>
+              <div className='space-y-2'>
+                <h3 className="text-xl font-semibold text-gray-900">Modifier l'utilisateur</h3>
+                <h2 className="text-sm font-medium text-gray-400">vous ne pouvez modifier que le role</h2>
+              </div>
               <button onClick={() => setEditingUser(null)} className="text-gray-400 hover:text-gray-600">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -390,15 +392,7 @@ export default function UsersManagement({
                   required
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
-                <input
-                  type="tel"
-                  value={editingUser.phone || ''}
-                  onChange={(e) => setEditingUser({ ...editingUser, phone: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
-                />
-              </div>
+             
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Rôle</label>
                 <select

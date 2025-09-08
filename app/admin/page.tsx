@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchStats, fetchProducts, createProduct, deleteProduct, Product, updateProduct } from '@/lib/api/products';
-import { fetchUsers, createUser, updateUser, deleteUser, User } from '@/lib/api/users';
+import { fetchUsers, createUser, updateUser, deleteUser, User, UserRole } from '@/lib/api/users';
 import { isAdmin } from '@/lib/auth';
 import AdminSidebar from '@/components/AdminSidebar';
 import ProductsManagement from '@/components/ProductsManagement';
@@ -113,9 +113,9 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleUpdateUser = async (id: number, userData: Partial<User>) => {
+  const handleUpdateUser = async (id: number, newRole: UserRole) => {
     try {
-      const updated = await updateUser(id, userData);
+      const updated = await updateUser(id, newRole);
       setUsers(users.map((u) => (u.id === updated.id ? updated : u)));
       return { success: true };
     } catch (err) {
