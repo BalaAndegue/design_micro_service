@@ -95,78 +95,106 @@ export default function CartPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Articles du panier */}
-          <div className="lg:col-span-2 space-y-4">
-            {items.map((item) => (
-              <Card key={item.id}>
-                <CardContent className="p-6">
-                  <div className="flex gap-4">
-                    <img
-                      src={item.imagePath}
-                      alt={item.productName}
-                      className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
-                    />
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold text-gray-900">{item.productName}</h3>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeItem(item.id)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      
-                      {/* Personnalisations */}
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {item.customizations && (
-                          <>
-                            {item.customizations.color && (
-                              <Badge variant="secondary">Couleur: {item.customizations.color}</Badge>
-                            )}
-                            {item.customizations.pattern && (
-                              <Badge variant="secondary">Motif: {item.customizations.pattern}</Badge>
-                            )}
-                            {item.customizations.size && (
-                              <Badge variant="secondary">Taille: {item.customizations.size}</Badge>
-                            )}
-                            {item.customizations.text && (
-                              <Badge variant="secondary">Texte: "{item.customizations.text}"</Badge>
-                            )}
-                          </>
-                        )}
-                      </div>
+  {/* Articles du panier */}
+  <div className="lg:col-span-2 space-y-4">
+    {items.map((item) => (
+      <Card 
+        key={item.id} 
+        className={item.isCustomized ? 
+          "border-2 border-orange-500" : 
+          "border-2 border-green-500"
+        }
+      >
+        <CardContent className="p-6">
+          <div className="flex gap-4">
+            <img
+              src={item.imagePath}
+              alt={item.productName}
+              className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+            />
+            <div className="flex-1">
+              <div className="flex justify-between items-start mb-2">
+                <div className="flex items-center">
+                  <h3 className="font-semibold text-gray-900">{item.productName}</h3>
+                  {item.isCustomized && (
+                    <Badge className="ml-2 bg-orange-500">Personnalisé</Badge>
+                  )}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeItem(item.id)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              {/* Personnalisations */}
+              {item.isCustomized && item.customizations && (
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {item.customizations.color && (
+                    <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                      Couleur: {item.customizations.color}
+                    </Badge>
+                  )}
+                  {item.customizations.pattern && (
+                    <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                      Motif: {item.customizations.pattern}
+                    </Badge>
+                  )}
+                  {item.customizations.size && (
+                    <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                      Taille: {item.customizations.size}
+                    </Badge>
+                  )}
+                  {item.customizations.text && (
+                    <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                      Texte: "{item.customizations.text}"
+                    </Badge>
+                  )}
+                  {item.customizations.font && (
+                    <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                      Police: {item.customizations.font}
+                    </Badge>
+                  )}
+                  {item.customizations.customImage && (
+                    <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                      Image personnalisée
+                    </Badge>
+                  )}
+                </div>
+              )}
 
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
-                          >
-                            <Minus className="h-3 w-3" />
-                          </Button>
-                          <span className="w-8 text-center">{item.quantity}</span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
-                          >
-                            <Plus className="h-3 w-3" />
-                          </Button>
-                        </div>
-                        <span className="font-bold text-blue-600">
-                          XAF {(item.price * item.quantity).toFixed(2)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
+                  >
+                    <Minus className="h-3 w-3" />
+                  </Button>
+                  <span className="w-8 text-center">{item.quantity}</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
+                  >
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                </div>
+                <span className="font-bold text-blue-600">
+                  XAF {(item.price * item.quantity).toFixed(2)}
+                </span>
+              </div>
+            </div>
           </div>
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+
 
           {/* Récapitulatif */}
           <div className="space-y-6">
