@@ -247,30 +247,43 @@ export default function ConfiguratorPage() {
   };
 
   const handleWhatsAppOrder = () => {
-    const totalPrice = calculatePrice() * quantity;
-    const productInfo = `
-    *Nouvelle Commande Personnalisée*
-    -----------------------------
-    *Produit:* ${product.name}
-    *Quantité:* ${quantity}
-    *Prix Unitaire:* XAF ${calculatePrice().toFixed(2)}
-    *Prix Total:* XAF ${totalPrice.toFixed(2)}
+  const totalPrice = calculatePrice() * quantity;
+  const productInfo = `
+*Nouvelle Commande Personnalisée*
+-----------------------------
+*Produit:* ${product.name}
+*Quantité:* ${quantity}
+*Prix Unitaire:* XAF ${calculatePrice().toFixed(2)}
+*Prix Total:* XAF ${totalPrice.toFixed(2)}
 
-    *Personnalisation:*
-    - Couleur: ${selectedColor.name}
-    - Motif: ${selectedPattern.name}
-    ${customText ? `- Texte: "${customText}" (Style: ${selectedFont.name})\n` : ''}
-    ${uploadedImage ? '- Image personnalisée incluse\n' : ''}
-    ${additionalNotes ? `\n*Notes supplémentaires:*\n${additionalNotes}` : ''}
-        `.trim();
+*Personnalisation:*
+- Couleur: ${selectedColor.name}
+- Motif: ${selectedPattern.name}
+${customText ? `- Texte: "${customText}" (Style: ${selectedFont.name})\n` : ''}
+${uploadedImage ? '- Image personnalisée incluse\n' : ''}
+${additionalNotes ? `\n*Notes supplémentaires:*\n${additionalNotes}` : ''}
+  `.trim();
 
-    // Encoder le message pour URL
-    const encodedMessage = encodeURIComponent(productInfo);
-    const phoneNumber = '+237655287884'; // Remplacez par le numéro d'admin
-    
-    // Ouvrir WhatsApp
-    window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
-  };
+  // Nettoyer le numéro de téléphone
+  const cleanPhoneNumber = '+237655287884'.replace(/\D/g, '');
+  
+  // Encoder le message pour URL
+  const encodedMessage = encodeURIComponent(productInfo);
+  
+  // Déterminer l'URL à utiliser en fonction de l'appareil
+  let whatsappUrl;
+  
+  if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    // Mobile - utiliser le schéma d'application
+    whatsappUrl = `whatsapp://send?phone=${cleanPhoneNumber}&text=${encodedMessage}`;
+  } else {
+    // Desktop - utiliser le site web
+    whatsappUrl = `https://web.whatsapp.com/send?phone=${cleanPhoneNumber}&text=${encodedMessage}`;
+  }
+  
+  // Ouvrir WhatsApp
+  window.location.href = whatsappUrl;
+};
 
   const handleLogin = () => {
     setShowLoginDialog(false);
