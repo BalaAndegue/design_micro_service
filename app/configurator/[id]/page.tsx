@@ -114,11 +114,13 @@ export default function ConfiguratorPage() {
       price: calculatePrice(),
       quantity,
       imagePath: uploadedImage || mockProduct.image,
+      isCustomized:true,
       customizations: {
         color: selectedColor.name,
         pattern: selectedPattern.name,
         text: customText || undefined,
         size: selectedSize.name,
+        font: customText || undefined,
         customImage: uploadedImage ? true : undefined
       }
     });

@@ -4,12 +4,16 @@ import { useState, useMemo } from 'react';
 import { User } from '@/lib/types/user';
 import { Search, Filter, X } from 'lucide-react';
 import { UserRole } from '@/lib/api/users';
+import { toast } from 'sonner';
+
+
+
 
 interface UsersManagementProps {
   users: User[];
   onCreateUser: (user: Omit<User, 'id' | 'createdAt'>) => Promise<{ success: boolean; error?: string }>;
   onUpdateUser: (id: number, newRole:UserRole) => Promise<{ success: boolean; error?: string }>;
-  onDeleteUser: (id: number) => Promise<{ success: boolean; error?: string }>;
+  onDeleteUser: (id: number) => Promise<{ success: boolean; error?: string ,message?:string}>;
 }
 
 export default function UsersManagement({
@@ -86,11 +90,25 @@ export default function UsersManagement({
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
-      await onDeleteUser(id);
+
+const handleDelete = async (id: number) => {
+  if (!confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) return;
+
+  try {
+    const result = await onDeleteUser(id);
+    
+    if (result.success) {
+      toast.success(result.message);
+      // Recharger la liste des utilisateurs ou mettre à jour le state
+    } else {
+      // Afficher le message d'erreur
+      toast.error(result.message);
     }
-  };
+  } catch (error) {
+    console.error('Error in handleDelete:', error);
+    toast.error('Une erreur inattendue est survenue');
+  }
+};
 
   const clearFilters = () => {
     setSearchTerm('');

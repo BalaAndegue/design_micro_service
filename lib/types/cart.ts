@@ -6,12 +6,15 @@ export interface CartItem {
   price: number;
   quantity: number;
   imagePath: string;
+  isCustomized:boolean;
   customizations?: {
     color?: string;
     pattern?: string;
+    font?:string;
     text?: string;
     size?: string;
     customImage?: boolean;
+    additionalNotes?:string;
   };
 }
 

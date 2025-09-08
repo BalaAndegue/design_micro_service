@@ -76,10 +76,44 @@ export const updateUser = async (userId: number, userData: Partial<User>): Promi
 };
 
 
-export const deleteUser = async (id: number): Promise<void> => {
-  const response = await fetch(`${API_URL}/admin/users/${id}`, {
-    method: 'DELETE',
-    headers:getAuthHeaders(),
-  });
-  if (!response.ok) throw new Error('Erreur lors de la suppression de l\'utilisateur');
+export const deleteUser = async (id: number): Promise<{ success: boolean; message: string }> => {
+  try {
+    const response = await fetch(`${API_URL}/admin/users/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      
+      // Vérifier si c'est une erreur de contrainte de clé étrangère
+      if (response.status === 409 || 
+          (errorData.message && errorData.message.includes('foreign key constraint'))) {
+        // Retourner un objet au lieu de lancer une erreur
+        return { 
+          success: false, 
+          message: 'Impossible de supprimer cet utilisateur car il a un panier actif. Veuillez d\'abord supprimer ou transférer le panier.' 
+        };
+      }
+      
+      // Pour les autres erreurs
+      return { 
+        success: false, 
+        message: errorData.message || 'Erreur lors de la suppression de l\'utilisateur' 
+      };
+    }
+
+    return { 
+      success: true, 
+      message: 'Utilisateur supprimé avec succès' 
+    };
+    
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    
+    return { 
+      success: false, 
+      message: error instanceof Error ? error.message : 'Une erreur est survenue lors de la suppression' 
+    };
+  }
 };
