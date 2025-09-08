@@ -249,20 +249,20 @@ export default function ConfiguratorPage() {
   const handleWhatsAppOrder = () => {
     const totalPrice = calculatePrice() * quantity;
     const productInfo = `
-*Nouvelle Commande Personnalisée*
------------------------------
-*Produit:* ${product.name}
-*Quantité:* ${quantity}
-*Prix Unitaire:* XAF ${calculatePrice().toFixed(2)}
-*Prix Total:* XAF ${totalPrice.toFixed(2)}
+    *Nouvelle Commande Personnalisée*
+    -----------------------------
+    *Produit:* ${product.name}
+    *Quantité:* ${quantity}
+    *Prix Unitaire:* XAF ${calculatePrice().toFixed(2)}
+    *Prix Total:* XAF ${totalPrice.toFixed(2)}
 
-*Personnalisation:*
-- Couleur: ${selectedColor.name}
-- Motif: ${selectedPattern.name}
-${customText ? `- Texte: "${customText}" (Style: ${selectedFont.name})\n` : ''}
-${uploadedImage ? '- Image personnalisée incluse\n' : ''}
-${additionalNotes ? `\n*Notes supplémentaires:*\n${additionalNotes}` : ''}
-    `.trim();
+    *Personnalisation:*
+    - Couleur: ${selectedColor.name}
+    - Motif: ${selectedPattern.name}
+    ${customText ? `- Texte: "${customText}" (Style: ${selectedFont.name})\n` : ''}
+    ${uploadedImage ? '- Image personnalisée incluse\n' : ''}
+    ${additionalNotes ? `\n*Notes supplémentaires:*\n${additionalNotes}` : ''}
+        `.trim();
 
     // Encoder le message pour URL
     const encodedMessage = encodeURIComponent(productInfo);

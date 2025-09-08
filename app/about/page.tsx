@@ -27,7 +27,7 @@ export default function AboutPage() {
   const [isVisible, setIsVisible] = useState(false);
 
   const adminWhatsApp = '+237656616751';
-  const adminEmail = 'admin@customworld.com';
+  const adminEmail = 'customworld25@gmail.com';
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -151,11 +151,7 @@ export default function AboutPage() {
       title: "Innovation Technologique",
       description: "Lancement de notre plateforme de design 3D en temps réel"
     },
-    {
-      year: "2024",
-      title: "Certification Qualité",
-      description: "Obtention de la certification ISO 9001 pour notre excellence opérationnelle"
-    }
+   
   ];
 
   return (
