@@ -26,7 +26,7 @@ export default function RootLayout({
         <AuthProvider>
           
           <CartProvider>
-            <Header/>
+            
             {children}
             <Toaster />
             <PaymentStatusWatcher />

@@ -64,7 +64,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addItem = async (items : CartItem) => {
     try {
       setIsLoading(true);
-      const updatedCart = await addToCart(items.id, items.quantity);
+      const updatedCart = await addToCart(items.id, items.quantity,false);
       setItems(updatedCart.items);
       setCardId(updatedCart.id)
       setError(null);

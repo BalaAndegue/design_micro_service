@@ -32,7 +32,7 @@ export default function CartPage() {
   const finalTotal = totalPrice - discount + shippingCost;
 
   const handlePromoCode = async () => {
-    setIsCheckingPromo(true);
+    setIsCheckingPromo(false);
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     // Codes promo simulés
@@ -46,8 +46,9 @@ export default function CartPage() {
 
     if (promoCodes[promoCode as keyof typeof promoCodes]) {
       const discountAmount = totalPrice * promoCodes[promoCode as keyof typeof promoCodes];
-      setDiscount(discountAmount);
-      toast.success(`Code promo appliqué ! -XAF ${discountAmount.toFixed(2)}`);
+      //setDiscount(discountAmount);
+      //toast.success(`Code promo appliqué ! -XAF ${discountAmount.toFixed(2)}`);
+      toast.success('le service n\'est pas encore disponible');
     } else {
       toast.error('Code promo invalide');
     }

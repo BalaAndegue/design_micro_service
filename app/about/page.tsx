@@ -156,7 +156,7 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 overflow-hidden">
-      
+      <Header />
       
       {/* Hero Section avec animation parallax */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">

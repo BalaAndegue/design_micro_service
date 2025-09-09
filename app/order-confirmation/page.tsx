@@ -23,7 +23,7 @@ import { useSearchParams } from 'next/navigation';
 import confetti from 'canvas-confetti';
 import { useCart } from '@/providers/cart-provider';
 import { useAuth } from '@/providers/auth-provider';
-import { Order, fetchOrder } from '@/lib/api/orders';
+import { Order, getOrderDetails } from '@/lib/api/orders';
 
 export default function OrderConfirmationPage() {
   const searchParams = useSearchParams();
@@ -68,8 +68,8 @@ export default function OrderConfirmationPage() {
     try {
       setLoading(true);
       // Note: Vous devrez peut-être adapter cette fonction selon votre API
-      //const orderData = await fetchOrder(orderId);
-      //setOrder(orderData);
+      const orderData = await getOrderDetails(orderId);
+      setOrder(orderData);
     } catch (err) {
       console.error('Erreur lors du chargement des détails de la commande:', err);
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
@@ -170,7 +170,7 @@ export default function OrderConfirmationPage() {
     transactionId: orderNumber || `CMD-${Date.now().toString().slice(-6)}`,
     modeLivraison: 0,
     phone: 'Non spécifié',
-    imagePath: '/images/placeholder-product.jpg'
+    imagePath: 'https://i.pinimg.com/736x/12/c4/e5/12c4e57a1e38ff65aa4137de5636ec93.jpg'
   };
 
   const StatusIcon = getStatusIcon(orderDetails.status);
@@ -405,7 +405,7 @@ export default function OrderConfirmationPage() {
         </Card>
       </div>
 
-      <Footer />
+      
     </div>
   );
 }

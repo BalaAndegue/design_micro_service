@@ -176,7 +176,7 @@ export default function ProfilePage() {
             </Button>
           </div>
         </div>
-        <Footer />
+      
       </div>
     );
   }
@@ -193,7 +193,7 @@ export default function ProfilePage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-3">
             <Card>
               <CardContent className="p-6 text-center">
                 <div className="relative mb-4">
@@ -203,7 +203,7 @@ export default function ProfilePage() {
                   </Avatar>
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">{user.name}</h2>
-                <p className="text-gray-600">{user.email}</p>
+                <div className='text-xs'><p className="text-gray-600">{user.email}</p></div>
                 <div className="mt-4 flex justify-center space-x-2">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-blue-600">{orders.length}</div>
@@ -333,7 +333,7 @@ export default function ProfilePage() {
                           />
                         </div>
 
-                        <Button type="submit" disabled={isLoading}>
+                        <Button type="submit" disabled={isLoading} className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800">
                           {isLoading ? (
                             <>
                               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -379,7 +379,7 @@ export default function ProfilePage() {
                             </FormItem>
                           )}
                         />
-                        <Button type="submit" disabled={isChangingPassword}>
+                        <Button type="submit" disabled={isChangingPassword} className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800">
                           {isChangingPassword ? (
                             <>
                               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -464,7 +464,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <Footer />
+     
       <FloatingCart/>
     </div>
   );

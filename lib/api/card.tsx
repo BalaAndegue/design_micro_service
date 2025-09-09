@@ -39,10 +39,10 @@ export const fetchCart = async (): Promise<Cart> => {
 };
 
 // Ajouter un article au panier
-export const addToCart = async (productId: number, quantity: number): Promise<Cart> => {
+export const addToCart = async (productId: number, quantity: number,isCutomized :boolean): Promise<Cart> => {
   try {
     // 1. Construire l'URL avec les paramètres de requête
-    const url = `${API_URL}/customer/cart/add?productId=${productId}&quantity=${quantity}`;
+    const url = `${API_URL}/customer/cart/add?productId=${productId}&quantity=${quantity}&isCustomized=${isCutomized}`;
 
     // 2. Faire la requête POST avec une URL modifiée
     const res = await fetch(url, {

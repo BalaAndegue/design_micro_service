@@ -284,10 +284,10 @@ export default function CheckoutPage() {
     for (const item of items) {
       const orderData = {
       
-        customerId: user?.id || 0,
-        productId: item.productId || 0,
+       
+     
         deliveryAddress: `${formData.address}, ${formData.city} ${formData.postalCode}, ${formData.country}`,
-        imagePath: item.imagePath,
+     
         modeLivraison: selectedShipping.id === 'standard' ? 0 : 
                       selectedShipping.id === 'express' ? 1 : 2,
         phone: formData.phone

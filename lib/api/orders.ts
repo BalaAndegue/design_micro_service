@@ -1,27 +1,13 @@
 import { API_URL ,getAuthHeaders} from "./config";
 
-export interface Order {
-  id: number;
-  customerId: number;
-  productId: number;
-  productName: string;
-  deliveryAddress: string;
-  status: 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
-  orderDate: string;
-  amount: number;
-  currency: string;
-  transactionId: string;
- 
-  modeLivraison: number;
-  phone: string;
-  imagePath: string;
-}
+
+
+
 
 export interface OrderRequest {
-  customerId: number |string;
-  productId: number;
+
   deliveryAddress: string;
-  imagePath: string;
+
   modeLivraison: number;
   phone: string;
 }
@@ -35,7 +21,7 @@ export interface OrderResponse {
   orderDate: string;
   amount: number;
   currency: string;
-  transactionId: string;
+  transactionId?: string;
   modeLivraison: number;
   phone: string;
 }
@@ -53,7 +39,54 @@ export interface OrderItem {
   imagePath: string;
 }
 
-export const createOrder = async (orderData: OrderRequest): Promise<OrderResponse> => {
+
+
+export interface Order {
+  id: number;
+  customerId: number;
+  productId: number;
+  imagePath: string;
+  productName:string;
+  deliveryAddress: string;
+  status:'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+  orderDate: string;
+  amount: number;
+  currency: string;
+  transactionId: string;
+  modeLivraison: number;
+  phone: string;
+  // Ajouter les propriétés pour les items si elles sont incluses dans la réponse
+  items?: Array<{
+    productId: number;
+    productName: string;
+    quantity: number;
+    price?:number;
+    isCutomized: boolean;
+    customizations?: Record<string, string>;
+    imagePath: string;
+  }>;
+}
+
+export const getOrders = async (): Promise<Order[]> => {
+  const response = await fetch(`${API_URL}/customer/orders`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('Non authentifié');
+    }
+    throw new Error('Erreur lors de la récupération des commandes');
+  }
+
+  return response.json();
+};
+
+
+
+
+export const createOrder = async (orderData: Omit<OrderRequest,"customerId" | "productId" | "imagePath">): Promise<OrderResponse> => {
   const response = await fetch(`${API_URL}/customer/orders`, {
     method: 'POST',
     headers: getAuthHeaders(),
@@ -93,6 +126,22 @@ export const fetchOrder = async (): Promise<Order[]> => {
   }
 };
 
+export const getOrderDetails = async (id : Number) : Promise<Order> =>{
+  try{
+    const response = await fetch(`${API_URL}/customer/${id}`,{
+      method : 'GET',
+      headers : getAuthHeaders(),
+      credentials: 'include',
+    });
+    if (!response.ok){
+      throw new Error(`Failed to fetch order details: ${response.status} ${response.statusText}`);
+    }
+    return response.json();
+  }catch (error){
+    console.error('Error fetching order details:', error);
+    throw new Error('Unable to fetch order details');
+  }
+}
 
 
 

@@ -47,7 +47,7 @@ export function ProductCard({
         price: product.price,
         quantity: 1,
         imagePath: product.imagePath,
-        customized:true,
+        customized:false,
         customizations: {}
       });
       

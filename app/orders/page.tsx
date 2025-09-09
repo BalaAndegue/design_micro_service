@@ -16,7 +16,8 @@ import {
   RefreshCw,
   Star,
   MessageCircle,
-  AlertCircle
+  AlertCircle,
+  Sparkles
 } from 'lucide-react';
 import { Header } from '@/components/layout/headerstes';
 import { Footer } from '@/components/layout/footer';
@@ -24,7 +25,7 @@ import { useAuth } from '@/providers/auth-provider';
 import Link from 'next/link';
 import FloatingCart from '@/components/FloatingCart';
 import { 
-  fetchOrder, 
+  getOrders, 
   getOrderStatusLabel, 
   getOrderStatusColor,
   type Order
@@ -55,7 +56,7 @@ export default function OrdersPage() {
     try {
       setLoading(true);
       setError(null);
-      const ordersData = await fetchOrder();
+      const ordersData = await getOrders();
       setOrders(ordersData);
     } catch (err) {
       console.error('Erreur lors du chargement des commandes:', err);
@@ -67,7 +68,9 @@ export default function OrdersPage() {
 
   const filteredOrders = orders.filter(order =>
     order.id.toString().includes(searchTerm) ||
-    order.productName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.items?.some(item => 
+      item.productName.toLowerCase().includes(searchTerm.toLowerCase())
+    ) ||
     order.transactionId?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -85,7 +88,6 @@ export default function OrdersPage() {
     }
   };
 
-  // Fonction pour formater le montant en toute sécurité
   const formatAmount = (amount: number | null | undefined, currency: string = 'XAF'): string => {
     if (amount === null || amount === undefined) {
       return `${currency} 0.00`;
@@ -93,9 +95,19 @@ export default function OrdersPage() {
     return `${currency} ${amount.toFixed(2)}`;
   };
 
-  // Fonction pour obtenir une valeur par défaut si null/undefined
   const getSafeValue = (value: any, defaultValue: any = '') => {
     return value !== null && value !== undefined ? value : defaultValue;
+  };
+
+  // Calculer le total d'une commande avec tous ses items
+  const calculateOrderTotal = (order: Order): number => {
+    if (order.items && order.items.length > 0) {
+      return order.items.reduce((total, item) => {
+        const itemPrice = item.isCutomized ? (item as any).customizedPrice || item.price : item.price;
+        return total + (itemPrice * item.quantity);
+      }, 0);
+    }
+    return order.amount || 0;
   };
 
   if (!user) {
@@ -199,93 +211,160 @@ export default function OrdersPage() {
             <TabsContent key={tab} value={tab} className="space-y-4">
               {filteredOrders
                 .filter(order => tab === 'all' || order.status === tab)
-                .map((order) => (
-                  <Card key={order.id} className="hover:shadow-md transition-shadow">
-                    <CardHeader className="pb-4">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle className="text-lg">Commande #{order.id}</CardTitle>
-                          <p className="text-sm text-gray-600">
-                            Commandé le {new Date(getSafeValue(order.orderDate)).toLocaleDateString('fr-FR')}
-                          </p>
-                          {order.transactionId && (
-                            <p className="text-sm text-gray-500">Référence: {getSafeValue(order.transactionId)}</p>
-                          )}
-                        </div>
-                        <div className="text-right">
-                          <Badge className={getOrderStatusColor(getSafeValue(order.status, 'PENDING'))}>
-                            {getStatusIcon(getSafeValue(order.status, 'PENDING'))}
-                            {getOrderStatusLabel(getSafeValue(order.status, 'PENDING'))}
-                          </Badge>
-                          <p className="text-lg font-bold text-blue-600 mt-1">
-                            {formatAmount(order.amount, order.currency)}
-                          </p>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    
-                    <CardContent className="space-y-4">
-                      {/* Informations du produit */}
-                      <div className="flex gap-3">
-                        <img
-                          src={getSafeValue(order.imagePath, '/images/placeholder-product.jpg')}
-                          alt={getSafeValue(order.productName, 'Produit')}
-                          className="w-16 h-16 object-cover rounded-lg"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/images/placeholder-product.jpg';
-                          }}
-                        />
-                        <div className="flex-1">
-                          <h4 className="font-medium">{getSafeValue(order.productName, 'Produit sans nom')}</h4>
-                          <p className="text-sm text-gray-600">Produit ID: {getSafeValue(order.productId, 'N/A')}</p>
-                          <div className="flex justify-between items-center mt-2">
-                            <span className="text-sm text-gray-600">Quantité: 1</span>
-                            <span className="font-medium">{formatAmount(order.amount, order.currency)}</span>
+                .map((order) => {
+                  const orderTotal = calculateOrderTotal(order);
+                  const hasItems = order.items && order.items.length > 0;
+                  
+                  return (
+                    <Card key={order.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader className="pb-4">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="text-lg">Commande #{order.id}</CardTitle>
+                            <p className="text-sm text-gray-600">
+                              Commandé le {new Date(order.orderDate).toLocaleDateString('fr-FR')}
+                            </p>
+                            {order.transactionId && (
+                              <p className="text-sm text-gray-500">Référence: {order.transactionId}</p>
+                            )}
+                            {hasItems && (
+                              <p className="text-sm text-gray-500">
+                                {order.items?.length ?? 0 } article{(order.items?.length ?? 0)> 1 ? 's' : ''}
+                              </p>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <Badge className={getOrderStatusColor(order.status)}>
+                              {getStatusIcon(order.status)}
+                              {getOrderStatusLabel(order.status)}
+                            </Badge>
+                            <p className="text-lg font-bold text-blue-600 mt-1">
+                              {formatAmount(orderTotal, order.currency)}
+                            </p>
                           </div>
                         </div>
-                      </div>
+                      </CardHeader>
+                      
+                      <CardContent className="space-y-4">
+                        {/* Articles de la commande */}
+                        <div className="space-y-3">
+                          {hasItems ? (
+                            order.items!.map((item, index) => (
+                              <div key={index} className="flex gap-3 p-3 bg-gray-50 rounded-lg">
+                                <img
+                                  src={getSafeValue(item.imagePath, '/images/placeholder-product.jpg')}
+                                  alt={item.productName}
+                                  className="w-16 h-16 object-cover rounded-lg"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = '/images/placeholder-product.jpg';
+                                  }}
+                                />
+                                <div className="flex-1">
+                                  <div className="flex justify-between items-start">
+                                    <h4 className="font-medium">{item.productName}</h4>
+                                    <span className="font-medium">
+                                      {formatAmount(
+                                        (item.isCutomized ? (item as any).customizedPrice || item.price : item.price) * item.quantity,
+                                        order.currency
+                                      )}
+                                    </span>
+                                  </div>
+                                  
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {item.isCutomized && (
+                                      <Badge variant="secondary" className="text-xs">
+                                        <Sparkles className="h-3 w-3 mr-1" />
+                                        Personnalisé
+                                      </Badge>
+                                    )}
+                                    <Badge variant="outline" className="text-xs">
+                                      Qté: {item.quantity}
+                                    </Badge>
+                                  </div>
 
-                      {/* Informations de livraison */}
-                      <div className="bg-gray-50 p-3 rounded-lg">
-                        <p className="text-sm font-medium text-gray-700 mb-1">Adresse de livraison:</p>
-                        <p className="text-sm text-gray-600">{getSafeValue(order.deliveryAddress, 'Adresse non spécifiée')}</p>
-                        <p className="text-sm text-gray-600 mt-1">
-                          <strong>Téléphone:</strong> {getSafeValue(order.phone, 'Non spécifié')}
-                        </p>
-                        <p className="text-sm text-gray-600 mt-1">
-                          <strong>Mode de livraison:</strong> {getLivraisonLabel(getSafeValue(order.modeLivraison, 0))}
-                        </p>
-                      </div>
+                                  {item.isCutomized && item.customizations && (
+                                    <div className="mt-2">
+                                      <p className="text-xs font-medium text-gray-700 mb-1">Personnalisation:</p>
+                                      <div className="flex flex-wrap gap-1">
+                                        {Object.entries(item.customizations).map(([key, value]) => (
+                                          <Badge key={key} variant="secondary" className="text-xs">
+                                            {key}: {value}
+                                          </Badge>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            // Fallback pour les anciennes commandes sans items
+                            <div className="flex gap-3 p-3 bg-gray-50 rounded-lg">
+                              <img
+                                src={getSafeValue(order.imagePath, '/images/placeholder-product.jpg')}
+                                alt={order.productName || 'Produit'}
+                                className="w-16 h-16 object-cover rounded-lg"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = '/images/placeholder-product.jpg';
+                                }}
+                              />
+                              <div className="flex-1">
+                                <div className="flex justify-between items-start">
+                                  <h4 className="font-medium">{getSafeValue(order.productName, 'Produit')}</h4>
+                                  <span className="font-medium">
+                                    {formatAmount(order.amount, order.currency)}
+                                  </span>
+                                </div>
+                                <Badge variant="outline" className="text-xs mt-1">
+                                  Qté: 1
+                                </Badge>
+                              </div>
+                            </div>
+                          )}
+                        </div>
 
-                      {/* Actions */}
-                      <div className="flex flex-wrap gap-2">
-                        <Button size="sm" variant="outline" disabled>
-                          <Download className="h-4 w-4 mr-2" />
-                          Facture (bientôt disponible)
-                        </Button>
-                        
-                        {order.status === 'SHIPPED' && (
-                          <Button size="sm" variant="outline">
-                            <Truck className="h-4 w-4 mr-2" />
-                            Suivre le colis
+                        {/* Informations de livraison */}
+                        <div className="bg-gray-50 p-3 rounded-lg">
+                          <p className="text-sm font-medium text-gray-700 mb-1">Adresse de livraison:</p>
+                          <p className="text-sm text-gray-600">{getSafeValue(order.deliveryAddress, 'Adresse non spécifiée')}</p>
+                          <p className="text-sm text-gray-600 mt-1">
+                            <strong>Téléphone:</strong> {getSafeValue(order.phone, 'Non spécifié')}
+                          </p>
+                          <p className="text-sm text-gray-600 mt-1">
+                            <strong>Mode de livraison:</strong> {getLivraisonLabel(getSafeValue(order.modeLivraison, 0))}
+                          </p>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex flex-wrap gap-2">
+                          <Button size="sm" variant="outline" disabled>
+                            <Download className="h-4 w-4 mr-2" />
+                            Facture (bientôt disponible)
                           </Button>
-                        )}
-                        
-                        {order.status === 'DELIVERED' && (
+                          
+                          {order.status === 'SHIPPED' && (
+                            <Button size="sm" variant="outline">
+                              <Truck className="h-4 w-4 mr-2" />
+                              Suivre le colis
+                            </Button>
+                          )}
+                          
+                          {order.status === 'DELIVERED' && (
+                            <Button size="sm" variant="outline">
+                              <Star className="h-4 w-4 mr-2" />
+                              Laisser un avis
+                            </Button>
+                          )}
+                          
                           <Button size="sm" variant="outline">
-                            <Star className="h-4 w-4 mr-2" />
-                            Laisser un avis
+                            <MessageCircle className="h-4 w-4 mr-2" />
+                            Support
                           </Button>
-                        )}
-                        
-                        <Button size="sm" variant="outline">
-                          <MessageCircle className="h-4 w-4 mr-2" />
-                          Support
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               
               {filteredOrders.filter(order => tab === 'all' || order.status === tab).length === 0 && (
                 <div className="text-center py-12">
@@ -301,9 +380,9 @@ export default function OrdersPage() {
             </TabsContent>
           ))}
         </Tabs>
-      </div>
+      </div>     
 
-      <Footer />
+    
       <FloatingCart/>
     </div>
   );
