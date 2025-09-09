@@ -62,7 +62,7 @@ export function Header() {
         isScrolled ? 'py-2 bg-white shadow-md border-b' : 'py-4 bg-transparent'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className=" mx-auto px-4 sm:px-6 lg:px-8 ">
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">

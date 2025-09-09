@@ -190,8 +190,7 @@ const CostumWorldLanding = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <Header/>
+    
 
       {/* Mobile Menu */}
       <AnimatePresence>
@@ -425,8 +424,7 @@ const CostumWorldLanding = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <Footer />
+     
 
       {/* Floating CTA */}
       <FloatingCart/>

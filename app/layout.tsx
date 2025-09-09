@@ -5,6 +5,8 @@ import { AuthProvider } from '@/providers/auth-provider';
 import { CartProvider } from '@/providers/cart-provider';
 import { Toaster } from '@/components/ui/sonner';
 import PaymentStatusWatcher from '@/components/PaymentStatusWatcher';
+import Footer from '@/components/layout/footer';
+import { Header } from '@/components/layout/headerstes';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,11 +24,14 @@ export default function RootLayout({
     <html lang="fr">
       <body className={inter.className}>
         <AuthProvider>
+          
           <CartProvider>
+            <Header/>
             {children}
             <Toaster />
             <PaymentStatusWatcher />
           </CartProvider>
+          <Footer/>
         </AuthProvider>
       </body>
     </html>

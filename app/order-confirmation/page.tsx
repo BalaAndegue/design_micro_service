@@ -12,18 +12,30 @@ import {
   Download,
   ArrowRight,
   Home,
-  Share2
+  Share2,
+  Clock,
+  AlertCircle
 } from 'lucide-react';
 import { Header } from '@/components/layout/headerstes';
 import { Footer } from '@/components/layout/footer';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import confetti from 'canvas-confetti';
+import { useCart } from '@/providers/cart-provider';
+import { useAuth } from '@/providers/auth-provider';
+import { Order, fetchOrder } from '@/lib/api/orders';
 
 export default function OrderConfirmationPage() {
   const searchParams = useSearchParams();
-  const orderNumber = searchParams.get('order') || 'CMD-123456';
+  const orderNumber = searchParams.get('order');
+  const source = searchParams.get('source');
+  const { clearCart } = useCart();
+  const { user } = useAuth();
+  
   const [isLoaded, setIsLoaded] = useState(false);
+  const [order, setOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -37,25 +49,131 @@ export default function OrderConfirmationPage() {
       });
     }, 500);
 
-    return () => clearTimeout(timer);
-  }, []);
+    // Vider le panier après une commande réussie
+    if (orderNumber) {
+      clearCart();
+    }
 
-  const orderDetails = {
-    orderNumber,
-    date: new Date().toLocaleDateString('fr-FR'),
-    total: 54.98,
-    estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR'),
-    items: [
-      {
-        name: 'Coque iPhone 15 Pro Personnalisée',
-        quantity: 2,
-        price: 24.99,
-        customizations: { color: 'Bleu', text: 'Mon iPhone' }
-      }
-    ],
-    shippingAddress: '123 Rue de la Paix, 75001 Paris, France',
-    email: 'client@example.com'
+    // Charger les détails de la commande si un numéro est fourni
+    if (orderNumber && !isNaN(Number(orderNumber))) {
+      fetchOrderDetails(Number(orderNumber));
+    } else {
+      setLoading(false);
+    }
+
+    return () => clearTimeout(timer);
+  }, [orderNumber, clearCart]);
+
+  const fetchOrderDetails = async (orderId: number) => {
+    try {
+      setLoading(true);
+      // Note: Vous devrez peut-être adapter cette fonction selon votre API
+      //const orderData = await fetchOrder(orderId);
+      //setOrder(orderData);
+    } catch (err) {
+      console.error('Erreur lors du chargement des détails de la commande:', err);
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const getStatusIcon = (status: string) => {
+    const statusIcons = {
+      'PENDING': Clock,
+      'PROCESSING': Clock,
+      'SHIPPED': Truck,
+      'DELIVERED': CheckCircle,
+      'CANCELLED': AlertCircle
+    };
+    return statusIcons[status as keyof typeof statusIcons] || Package;
+  };
+
+  const getStatusLabel = (status: string): string => {
+    const statusMap: Record<string, string> = {
+      'PENDING': 'En attente',
+      'PROCESSING': 'En traitement',
+      'SHIPPED': 'Expédié',
+      'DELIVERED': 'Livré',
+      'CANCELLED': 'Annulé'
+    };
+    return statusMap[status] || status;
+  };
+
+  const getLivraisonLabel = (modeLivraison: number): string => {
+    switch (modeLivraison) {
+      case 0: return 'Standard';
+      case 1: return 'Express';
+      case 2: return 'Premium';
+      default: return `Mode ${modeLivraison}`;
+    }
+  };
+
+  const formatAmount = (amount: number | null | undefined, currency: string = 'XAF'): string => {
+    if (amount === null || amount === undefined) {
+      return `${currency} 0.00`;
+    }
+    return `${currency} ${amount.toFixed(2)}`;
+  };
+
+  const getSafeValue = (value: any, defaultValue: any = '') => {
+    return value !== null && value !== undefined ? value : defaultValue;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex justify-center items-center py-12">
+            <Clock className="h-8 w-8 animate-spin text-blue-600 mr-2" />
+            <span>Chargement de votre commande...</span>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Erreur de chargement</h3>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Link href="/orders">
+              <Button>
+                Voir mes commandes
+              </Button>
+            </Link>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Données par défaut si aucune commande n'est chargée
+  const orderDetails = order || {
+    id: Number(orderNumber) || Math.floor(Math.random() * 10000),
+    customerId: user?.id || 0,
+    productId: 0,
+    productName: 'Produit personnalisé',
+    deliveryAddress: 'Adresse non spécifiée',
+    status: 'PENDING',
+    orderDate: new Date().toISOString(),
+    amount: 0,
+    currency: 'XAF',
+    transactionId: orderNumber || `CMD-${Date.now().toString().slice(-6)}`,
+    modeLivraison: 0,
+    phone: 'Non spécifié',
+    imagePath: '/images/placeholder-product.jpg'
+  };
+
+  const StatusIcon = getStatusIcon(orderDetails.status);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -67,9 +185,14 @@ export default function OrderConfirmationPage() {
           <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4">
             <CheckCircle className="h-12 w-12 text-green-600" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Commande confirmée !</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {source === 'whatsapp' ? 'Commande envoyée !' : 'Commande confirmée !'}
+          </h1>
           <p className="text-lg text-gray-600">
-            Merci pour votre commande. Vous recevrez bientôt un email de confirmation.
+            {source === 'whatsapp' 
+              ? 'Votre commande a été envoyée via WhatsApp. Notre équipe vous contactera rapidement.'
+              : 'Merci pour votre commande. Vous recevrez bientôt un email de confirmation.'
+            }
           </p>
         </div>
 
@@ -87,43 +210,56 @@ export default function OrderConfirmationPage() {
                 <div className="flex justify-between items-center">
                   <span className="font-medium">Numéro de commande:</span>
                   <Badge variant="outline" className="font-mono">
-                    {orderDetails.orderNumber}
+                    #{orderDetails.id}
                   </Badge>
                 </div>
                 
                 <div className="flex justify-between items-center">
                   <span className="font-medium">Date de commande:</span>
-                  <span>{orderDetails.date}</span>
+                  <span>{new Date(orderDetails.orderDate).toLocaleDateString('fr-FR')}</span>
                 </div>
                 
                 <div className="flex justify-between items-center">
-                  <span className="font-medium">Livraison estimée:</span>
-                  <span className="text-green-600 font-medium">{orderDetails.estimatedDelivery}</span>
+                  <span className="font-medium">Statut:</span>
+                  <Badge className="bg-blue-100 text-blue-800">
+                    <StatusIcon className="h-3 w-3 mr-1" />
+                    {getStatusLabel(orderDetails.status)}
+                  </Badge>
                 </div>
 
+                {orderDetails.transactionId && (
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Référence:</span>
+                    <span className="text-sm text-gray-500">{orderDetails.transactionId}</span>
+                  </div>
+                )}
+
                 <div className="pt-4">
-                  <h3 className="font-medium mb-3">Articles commandés:</h3>
-                  {orderDetails.items.map((item, index) => (
-                    <div key={index} className="flex justify-between items-start p-3 bg-gray-50 rounded-lg">
+                  <h3 className="font-medium mb-3">Article commandé:</h3>
+                  <div className="flex justify-between items-start p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <img
+                        src={getSafeValue(orderDetails.imagePath, '/images/placeholder-product.jpg')}
+                        alt={orderDetails.productName}
+                        className="w-12 h-12 object-cover rounded"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/images/placeholder-product.jpg';
+                        }}
+                      />
                       <div>
-                        <h4 className="font-medium">{item.name}</h4>
-                        <p className="text-sm text-gray-600">Quantité: {item.quantity}</p>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {Object.entries(item.customizations).map(([key, value]) => (
-                            <Badge key={key} variant="secondary" className="text-xs">
-                              {key}: {value}
-                            </Badge>
-                          ))}
-                        </div>
+                        <h4 className="font-medium">{getSafeValue(orderDetails.productName, 'Produit personnalisé')}</h4>
+                        <p className="text-sm text-gray-600">Produit ID: {orderDetails.productId}</p>
                       </div>
-                      <span className="font-medium">XAF {(item.price * item.quantity).toFixed(2)}</span>
                     </div>
-                  ))}
+                    <span className="font-medium">{formatAmount(orderDetails.amount, orderDetails.currency)}</span>
+                  </div>
                 </div>
 
                 <div className="flex justify-between items-center pt-4 border-t">
                   <span className="text-lg font-bold">Total:</span>
-                  <span className="text-lg font-bold text-blue-600">XAF {orderDetails.total}</span>
+                  <span className="text-lg font-bold text-blue-600">
+                    {formatAmount(orderDetails.amount, orderDetails.currency)}
+                  </span>
                 </div>
               </CardContent>
             </Card>
@@ -135,18 +271,28 @@ export default function OrderConfirmationPage() {
                   Informations de livraison
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div>
-                    <span className="font-medium">Adresse de livraison:</span>
-                    <p className="text-gray-600 mt-1">{orderDetails.shippingAddress}</p>
-                  </div>
-                  
+              <CardContent className="space-y-3">
+                <div>
+                  <span className="font-medium">Adresse de livraison:</span>
+                  <p className="text-gray-600 mt-1">{getSafeValue(orderDetails.deliveryAddress, 'Adresse non spécifiée')}</p>
+                </div>
+                
+                <div>
+                  <span className="font-medium">Téléphone:</span>
+                  <p className="text-gray-600 mt-1">{getSafeValue(orderDetails.phone, 'Non spécifié')}</p>
+                </div>
+                
+                <div>
+                  <span className="font-medium">Mode de livraison:</span>
+                  <p className="text-gray-600 mt-1">{getLivraisonLabel(getSafeValue(orderDetails.modeLivraison, 0))}</p>
+                </div>
+
+                {user?.email && (
                   <div>
                     <span className="font-medium">Email de confirmation:</span>
-                    <p className="text-gray-600 mt-1">{orderDetails.email}</p>
+                    <p className="text-gray-600 mt-1">{user.email}</p>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -195,7 +341,7 @@ export default function OrderConfirmationPage() {
                 <CardTitle>Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full" variant="outline">
+                <Button className="w-full" variant="outline" disabled>
                   <Download className="h-4 w-4 mr-2" />
                   Télécharger la facture
                 </Button>

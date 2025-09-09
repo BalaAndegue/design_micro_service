@@ -16,6 +16,7 @@ interface AdminSidebarProps {
   activeSection: ActiveSection;
   setActiveSection: (section: ActiveSection) => void;
   isMobileOpen?: boolean;
+  onToggle?: () => void;
   onClose?: () => void;
 }
 
@@ -23,6 +24,7 @@ export default function AdminSidebar({
   activeSection, 
   setActiveSection, 
   isMobileOpen = false, 
+  onToggle,
   onClose 
 }: AdminSidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -148,7 +150,7 @@ export default function AdminSidebar({
       {/* Bouton pour ouvrir le sidebar sur mobile quand il est fermé */}
       {!isMobileOpen && (
         <button
-          onClick={onClose}
+          onClick={onToggle} // Correction ici : utiliser onToggle au lieu de onClose
           className="fixed bottom-4 left-4 bg-blue-700 text-white p-3 rounded-full shadow-lg z-40 lg:hidden"
           title="Ouvrir le menu"
         >

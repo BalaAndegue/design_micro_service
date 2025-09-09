@@ -1,4 +1,3 @@
-// app/admin/page.tsx
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -32,8 +31,17 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
   const [usersLoading, setUsersLoading] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const router = useRouter();
+
+  // Fonctions pour gérer l'état mobile
+  const handleToggleMobile = () => {
+    setIsMobileOpen(!isMobileOpen);
+  };
+
+  const handleCloseMobile = () => {
+    setIsMobileOpen(false);
+  };
 
   useEffect(() => {
     if (!isAdmin()) {
@@ -116,7 +124,6 @@ export default function AdminDashboard() {
 
   const handleUpdateUser = async (id: number, newRole: UserRole) => {
     try {
-      // Correction: Passer un objet Partial<User> au lieu de juste le rôle
       const updateData: Partial<User> = { role: newRole };
       const updated = await updateUser(id, updateData);
       setUsers(users.map((u) => (u.id === updated.id ? updated : u)));
@@ -214,110 +221,85 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar pour desktop */}
-      <div className="hidden lg:block">
-        <AdminSidebar 
-          activeSection={activeSection} 
-          setActiveSection={setActiveSection} 
+    <div className="min-h-screen bg-gray-100">
+      <div className="flex">
+        {/* Sidebar avec gestion mobile unifiée */}
+        <AdminSidebar
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+          isMobileOpen={isMobileOpen}
+          onToggle={handleToggleMobile}
+          onClose={handleCloseMobile}
         />
-      </div>
-
-      {/* Overlay pour mobile */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar mobile */}
-      <div className={`
-        fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out
-        lg:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        <div className="p-4 flex justify-between items-center border-b">
-          <h2 className="text-xl font-semibold">Administration</h2>
-          <button onClick={() => setSidebarOpen(false)} className="p-1">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        <AdminSidebar 
-          activeSection={activeSection} 
-          setActiveSection={(section) => {
-            setActiveSection(section);
-            setSidebarOpen(false);
-          }} 
-        />
-      </div>
-
-      {/* Contenu principal */}
-      <div className="flex-1 flex flex-col lg:ml-0">
-        {/* Header */}
-        <header className="bg-white shadow-sm sticky top-0 z-30">
-          <div className="px-4 py-3 sm:px-6 flex justify-between items-center">
-            <div className="flex items-center">
-              <button 
-                onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 mr-2 rounded-md text-gray-600 hover:bg-gray-100"
-              >
-                <Menu className="h-5 w-5" />
-              </button>
-              <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">
-                {getSectionTitle()}
-              </h1>
-            </div>
-            
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              <Link href="/">
-                <button className="flex items-center bg-blue-500 text-white space-x-1 sm:space-x-2 px-3 py-2 rounded-lg hover:bg-blue-600 transition-colors">
-                  <Home className="h-4 w-4" />
-                  <span className="hidden sm:inline">Accueil</span>
+        
+        {/* Contenu principal */}
+        <div className="flex-1 flex flex-col lg:ml-0">
+          {/* Header */}
+          <header className="bg-white shadow-sm sticky top-0 z-30">
+            <div className="px-4 py-3 sm:px-6 flex justify-between items-center">
+              <div className="flex items-center">
+                <button 
+                  onClick={handleToggleMobile}
+                  className="lg:hidden p-2 mr-2 rounded-md text-gray-600 hover:bg-gray-100"
+                >
+                  <Menu className="h-5 w-5" />
                 </button>
-              </Link>
+                <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">
+                  {getSectionTitle()}
+                </h1>
+              </div>
               
-              <button className="p-2 rounded-full bg-gray-200 hover:bg-gray-300">
-                <Bell className="h-5 w-5 text-gray-600" />
-              </button>
-              
-              <div className="relative">
-                <button className="flex items-center space-x-2">
-                  <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold text-sm sm:text-base">
-                    A
-                  </div>
-                  <span className="hidden sm:inline text-gray-700">Admin</span>
+              <div className="flex items-center space-x-2 sm:space-x-4">
+                <Link href="/">
+                  <button className="flex items-center bg-blue-500 text-white space-x-1 sm:space-x-2 px-3 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                    <Home className="h-4 w-4" />
+                    <span className="hidden sm:inline">Accueil</span>
+                  </button>
+                </Link>
+                
+                <button className="p-2 rounded-full bg-gray-200 hover:bg-gray-300">
+                  <Bell className="h-5 w-5 text-gray-600" />
                 </button>
+                
+                <div className="relative">
+                  <button className="flex items-center space-x-2">
+                    <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold text-sm sm:text-base">
+                      A
+                    </div>
+                    <span className="hidden sm:inline text-gray-700">Admin</span>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </header>
-        
-        {/* Contenu */}
-        <main className="flex-1 p-4 sm:p-6 overflow-auto">
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 sm:mb-6" role="alert">
-              <span className="block sm:inline">{error}</span>
-              <button 
-                onClick={() => setError(null)} 
-                className="absolute top-0 right-0 p-3"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          )}
+          </header>
           
-          <div className="min-h-[calc(100vh-200px)]">
-            {renderActiveSection()}
-          </div>
-        </main>
+          {/* Contenu */}
+          <main className="flex-1 p-4 sm:p-6 overflow-auto">
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 sm:mb-6" role="alert">
+                <span className="block sm:inline">{error}</span>
+                <button 
+                  onClick={() => setError(null)} 
+                  className="absolute top-0 right-0 p-3"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+            
+            <div className="min-h-[calc(100vh-200px)]">
+              {renderActiveSection()}
+            </div>
+          </main>
 
-        {/* Footer mobile simplifié */}
-        <footer className="lg:hidden bg-white border-t p-4">
-          <div className="flex justify-between items-center text-sm text-gray-600">
-            <span>© 2025 CostumWorld</span>
-            <span>Admin Panel</span>
-          </div>
-        </footer>
+          {/* Footer mobile simplifié */}
+          <footer className="lg:hidden bg-white border-t p-4">
+            <div className="flex justify-between items-center text-sm text-gray-600">
+              <span>© 2025 CostumWorld</span>
+              <span>Admin Panel</span>
+            </div>
+          </footer>
+        </div>
       </div>
     </div>
   );

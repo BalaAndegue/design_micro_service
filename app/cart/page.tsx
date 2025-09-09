@@ -59,7 +59,7 @@ export default function CartPage() {
       <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center">
+          <div className="text-center mt-20">
             <ShoppingBag className="h-24 w-24 text-gray-300 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Votre panier est vide</h1>
             <p className="text-gray-600 mb-8">Découvrez nos produits et commencez à personnaliser !</p>
@@ -70,7 +70,7 @@ export default function CartPage() {
             </Link>
           </div>
         </div>
-        <Footer />
+      
       </div>
     );
   }
@@ -310,7 +310,7 @@ export default function CartPage() {
         </div>
       </div>
 
-      <Footer />
+      
     </div>
   );
 }
