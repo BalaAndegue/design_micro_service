@@ -114,7 +114,7 @@ export default function ConfiguratorPage() {
       price: calculatePrice(),
       quantity,
       imagePath: uploadedImage || mockProduct.image,
-      isCustomized:true,
+      customized:true,
       customizations: {
         color: selectedColor.name,
         pattern: selectedPattern.name,
