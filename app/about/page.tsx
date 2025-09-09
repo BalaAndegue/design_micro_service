@@ -13,6 +13,7 @@ import {
 import { toast } from 'sonner';
 import { Header } from '@/components/layout/headerstes';
 import Footer from '@/components/layout/footer';
+import { getAuthHeaders } from '@/lib/api/card';
 
 export default function AboutPage() {
   const [formData, setFormData] = useState({
@@ -50,11 +51,9 @@ export default function AboutPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://customworld.onrender.com/api/contact', {
+      const response = await fetch('https://customworld.onrender.com/api/notifications/send-email', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(formData),
       });
 

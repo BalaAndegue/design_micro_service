@@ -12,7 +12,7 @@ export interface ProfileData {
 
 export const updateProfile = async (profileData: ProfileData): Promise<ProfileData> => {
   try {
-    const response = await fetch(`${API_URL}/customer/profile`, {
+    const response = await fetch(`${API_URL}/auth/update-user`, {
       method: 'PUT',
       headers: getAuthHeaders(),
       credentials: 'include',
