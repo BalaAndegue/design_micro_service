@@ -283,6 +283,7 @@ export default function CheckoutPage() {
     // Enregistrer chaque produit de la commande via l'API
     for (const item of items) {
       const orderData = {
+      
         customerId: user?.id || 0,
         productId: item.productId || 0,
         deliveryAddress: `${formData.address}, ${formData.city} ${formData.postalCode}, ${formData.country}`,

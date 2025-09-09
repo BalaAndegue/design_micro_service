@@ -33,7 +33,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { fetchOrders } from '@/lib/api/orders';
+import { fetchOrder } from '@/lib/api/orders';
 import { resetPasswordRequest} from '@/lib/api/auth';
 import { updateProfile } from '@/lib/api/profile';
 import FloatingCart from '@/components/FloatingCart';
@@ -108,7 +108,7 @@ export default function ProfilePage() {
   const loadOrders = async () => {
     try {
       setIsLoading(true);
-      const ordersData = await fetchOrders();
+      const ordersData = await fetchOrder();
       setOrders(ordersData);
     } catch (error) {
       console.error('Error fetching orders:', error);

@@ -6,7 +6,7 @@ export interface CartItem {
   price: number;
   quantity: number;
   imagePath: string;
-  isCustomized:boolean;
+  customized:boolean;
   customizations?: {
     color?: string;
     pattern?: string;

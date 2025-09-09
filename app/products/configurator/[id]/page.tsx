@@ -215,7 +215,7 @@ export default function ConfiguratorPage() {
         price: calculatePrice(),
         quantity: quantity,
         imagePath: uploadedImage || product.imagePath || '',
-        isCustomized: true,
+        customized: true,
         customizations: {
           color: selectedColor.name,
           pattern: selectedPattern.name,

@@ -4,12 +4,17 @@ export interface Order {
   id: number;
   customerId: number;
   productId: number;
+  productName: string;
   deliveryAddress: string;
   status: 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
   orderDate: string;
   amount: number;
   currency: string;
   transactionId: string;
+ 
+  modeLivraison: number;
+  phone: string;
+  imagePath: string;
 }
 
 export interface OrderRequest {
@@ -35,6 +40,19 @@ export interface OrderResponse {
   phone: string;
 }
 
+
+
+export interface OrderItem {
+  id: number;
+  orderId: number;
+  productId: number;
+  productName: string;
+  quantity: number;
+  price: number;
+  customizations?: Record<string, string>;
+  imagePath: string;
+}
+
 export const createOrder = async (orderData: OrderRequest): Promise<OrderResponse> => {
   const response = await fetch(`${API_URL}/customer/orders`, {
     method: 'POST',
@@ -56,7 +74,7 @@ export const createWhatsAppOrder = async (orderData: OrderRequest): Promise<Orde
 
 
 
-export const fetchOrders = async (): Promise<Order[]> => {
+export const fetchOrder = async (): Promise<Order[]> => {
   try {
     const response = await fetch(`${API_URL}/customer/orders`, {
       method: 'GET',
@@ -73,4 +91,29 @@ export const fetchOrders = async (): Promise<Order[]> => {
     console.error('Error fetching orders:', error);
     throw new Error('Unable to fetch orders');
   }
+};
+
+
+
+
+export const getOrderStatusLabel = (status: string): string => {
+  const statusMap: Record<string, string> = {
+    'PENDING': 'En attente',
+    'PROCESSING': 'En traitement',
+    'SHIPPED': 'Expédié',
+    'DELIVERED': 'Livré',
+    'CANCELLED': 'Annulé'
+  };
+  return statusMap[status] || status;
+};
+
+export const getOrderStatusColor = (status: string): string => {
+  const colorMap: Record<string, string> = {
+    'PENDING': 'bg-yellow-500',
+    'PROCESSING': 'bg-orange-500',
+    'SHIPPED': 'bg-blue-500',
+    'DELIVERED': 'bg-green-500',
+    'CANCELLED': 'bg-red-500'
+  };
+  return colorMap[status] || 'bg-gray-500';
 };

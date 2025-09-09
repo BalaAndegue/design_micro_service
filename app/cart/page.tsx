@@ -100,7 +100,7 @@ export default function CartPage() {
     {items.map((item) => (
       <Card 
         key={item.id} 
-        className={item.isCustomized ? 
+        className={item.customized ? 
           "border-2 border-orange-500" : 
           "border-2 border-green-500"
         }
@@ -116,7 +116,7 @@ export default function CartPage() {
               <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center">
                   <h3 className="font-semibold text-gray-900">{item.productName}</h3>
-                  {item.isCustomized && (
+                  {item.customized && (
                     <Badge className="ml-2 bg-orange-500">Personnalisé</Badge>
                   )}
                 </div>
@@ -131,7 +131,7 @@ export default function CartPage() {
               </div>
               
               {/* Personnalisations */}
-              {item.isCustomized && item.customizations && (
+              {item.customized && item.customizations && (
                 <div className="flex flex-wrap gap-2 mb-3">
                   {item.customizations.color && (
                     <Badge variant="secondary" className="bg-orange-100 text-orange-800">
