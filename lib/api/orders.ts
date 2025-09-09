@@ -12,6 +12,50 @@ export interface Order {
   transactionId: string;
 }
 
+export interface OrderRequest {
+  customerId: number |string;
+  productId: number;
+  deliveryAddress: string;
+  imagePath: string;
+  modeLivraison: number;
+  phone: string;
+}
+
+export interface OrderResponse {
+  id: number;
+  customerId: number;
+  productId: number;
+  deliveryAddress: string;
+  status: string;
+  orderDate: string;
+  amount: number;
+  currency: string;
+  transactionId: string;
+  modeLivraison: number;
+  phone: string;
+}
+
+export const createOrder = async (orderData: OrderRequest): Promise<OrderResponse> => {
+  const response = await fetch(`${API_URL}/customer/orders`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(orderData),
+  });
+
+  if (!response.ok) {
+    throw new Error('Erreur lors de la création de la commande');
+  }
+
+  return response.json();
+};
+
+export const createWhatsAppOrder = async (orderData: OrderRequest): Promise<OrderResponse> => {
+  // Cette fonction peut avoir une logique spécifique pour les commandes WhatsApp
+  return createOrder(orderData);
+};
+
+
+
 export const fetchOrders = async (): Promise<Order[]> => {
   try {
     const response = await fetch(`${API_URL}/customer/orders`, {
