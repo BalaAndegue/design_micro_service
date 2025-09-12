@@ -117,7 +117,7 @@ export function Header() {
               }`}
             >
               <Search className="h-5 w-5" />
-            </Button> 
+            </Button>  */}
             <Button
           variant="ghost"
           size="icon"
@@ -128,7 +128,7 @@ export function Header() {
           <span className="sr-only">Toggle theme</span>
         </Button>
 
- */}
+
             {role === 'ADMIN' && (
               <Link href="/admin" className="hidden md:inline">
                 <Button

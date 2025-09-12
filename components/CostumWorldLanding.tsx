@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, ShoppingBag, Star, Search, Menu, X, ArrowRight, ArrowLeft, ShieldCheck, Truck, CreditCard, RefreshCw } from 'lucide-react';
+import { ChevronRight, ShoppingBag, Star, Search, Menu, X, ArrowRight, ArrowLeft, ShieldCheck, Truck, CreditCard, RefreshCw, Link } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from './layout/header';
 import { Product, fetchProducts } from '@/lib/api/products';
@@ -108,32 +108,32 @@ const CostumWorldLanding = () => {
     {
       title: "Summer Collection 2025",
       subtitle: "Discover our new arrivals",
-      image: "https://i.pinimg.com/736x/d9/02/8f/d9028f4fd1c47fa15d5e3f05c2cc0edf.jpg",
-      cta: "Shop Now"
+      image: "https://i.pinimg.com/736x/1c/1d/da/1c1dda857ad89a1ce9a66a4466dd4097.jpg",
+      cta: "Design Now"
     },
     {
       title: "Premium Membership",
       subtitle: "Up to 40% off on selected items",
-      image: "https://i.pinimg.com/736x/54/d9/39/54d93922987c785616babd8702170651.jpg",
-      cta: "shop Now"
+      image: "https://i.pinimg.com/1200x/c2/ec/cb/c2eccbb2b785a6f4884d2bbe184e9ee2.jpg",
+      cta: "Design Now"
     },
     {
       title: "Summer Collection 2025",
       subtitle: "Get exclusive benefits & early access",
-      image: "https://i.pinimg.com/1200x/a7/fd/9d/a7fd9d8233b50e293f20041dcc7d2741.jpg",
-      cta: "Shop Now"
+      image: "https://i.pinimg.com/1200x/0c/43/19/0c43195c7cf2a0aedb9f8ef83d2c0b1c.jpg",
+      cta: "Design Now"
     },
     {
       title: "Premium Membership",
       subtitle: "Get exclusive benefits & early access",
-      image: "https://i.pinimg.com/736x/31/09/f6/3109f6c09d18ac5ccee9e2b5364ef853.jpg",
-      cta: "Shop Now"
+      image: "https://i.pinimg.com/736x/74/fb/e2/74fbe2c3dcbf1221b00865c277c70cf2.jpg",
+      cta: "Design Now"
     },
     {
       title: "Summer Collection",
       subtitle: "Get exclusive benefits & early access",
-      image: "https://i.pinimg.com/736x/6f/64/7f/6f647f4abd4dd02bb7ea1515814d13cc.jpg",
-      cta: "Shop Now"
+      image: "https://i.pinimg.com/1200x/bf/ce/a3/bfcea34421fbaa0c8b1663762c6ee670.jpg",
+      cta: "Design Now"
     }
   ];
 
@@ -258,10 +258,12 @@ const CostumWorldLanding = () => {
               <p className="text-xl md:text-2xl mb-8 opacity-90">
                 {heroSlides[currentSlide].subtitle}
               </p>
+              <Link href="/conufigurator/1"> 
               <button className="px-8 py-3 bg-white text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition-colors flex items-center space-x-2">
                 <span>{heroSlides[currentSlide].cta}</span>
                 <ArrowRight className="w-5 h-5" />
               </button>
+              </Link>
             </motion.div>
           </div>
         </div>
