@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Grid3X3, List } from 'lucide-react';
-import { Header } from '@/components/layout/headerstes';
+import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { useCart } from '@/providers/cart-provider';
 import { fetchProducts, Product, fetchCategories, Category } from '@/lib/api/products';

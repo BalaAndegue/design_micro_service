@@ -23,7 +23,7 @@ import {
   CheckCircle,
   Smartphone
 } from 'lucide-react';
-import { Header } from '@/components/layout/headerstes';
+import { Header } from '@/components/layout/header';
 import { useCart } from '@/providers/cart-provider';
 import { useAuth } from '@/providers/auth-provider';
 import Link from 'next/link';

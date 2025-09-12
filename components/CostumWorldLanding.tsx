@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ShoppingBag, Star, Search, Menu, X, ArrowRight, ArrowLeft, ShieldCheck, Truck, CreditCard, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Header } from './layout/headerstes';
+import { Header } from './layout/header';
 import { Product, fetchProducts } from '@/lib/api/products';
 import { Footer } from '@/components/layout/footer';
 import FloatingCart from './FloatingCart';
@@ -386,7 +386,7 @@ const CostumWorldLanding = () => {
             <FeatureCard
               icon={<Truck className="w-6 h-6" />}
               title="Free Shipping"
-              description="On all orders over $50"
+              description="On all orders over XAF50000"
             />
             <FeatureCard
               icon={<RefreshCw className="w-6 h-6" />}

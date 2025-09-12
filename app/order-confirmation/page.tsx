@@ -16,7 +16,7 @@ import {
   Clock,
   AlertCircle
 } from 'lucide-react';
-import { Header } from '@/components/layout/headerstes';
+import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';

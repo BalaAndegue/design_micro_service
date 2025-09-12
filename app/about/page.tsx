@@ -11,7 +11,7 @@ import {
   TrendingUp, Palette, Gift, Headphones, MapPin
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Header } from '@/components/layout/headerstes';
+import { Header } from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { getAuthHeaders } from '@/lib/api/card';
 
