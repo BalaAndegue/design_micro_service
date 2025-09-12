@@ -29,6 +29,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import logo_coupé_noir from '@/app/assets/logo_coupé_noir.png';
 import { useTheme } from 'next-themes';
+import { getUserRole } from '@/lib/auth';
 
 
 export function Header() {
@@ -46,6 +47,7 @@ export function Header() {
     { name: 'About', href: '/about' },
     
   ];
+  const role = getUserRole();
 
   // Gérer le scroll pour changer le style du header
   useEffect(() => {
@@ -120,7 +122,23 @@ export function Header() {
           <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           <span className="sr-only">Toggle theme</span>
         </Button>
+
  */}
+            {role === 'ADMIN' && (
+              <Link href="/admin" className="hidden md:inline">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={`${
+                    isScrolled
+                      ? 'text-blue-600 border-blue-600 hover:bg-blue-50'
+                      : 'text-white border-white hover:bg-blue/20'
+                  } rounded-lg transition-colors px-2 py-2`}
+                >
+                  Admin 
+                </Button>
+              </Link>
+            )}
 
             {/* Cart */}
             <Link href="/cart">
@@ -255,6 +273,18 @@ export function Header() {
                   </div>
                 </>
               )}
+              {role === 'ADMIN' &&(
+              <nav className="mt-4 border-t pt-4">
+                <Link href="/admin" onClick={() => setIsMenuOpen(false)}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-blue-600 border-blue-600 hover:bg-blue-50 rounded-lg transition-colors px-2 py-2"
+                  >
+                    Admin 
+                  </Button>
+                </Link> 
+              </nav>)}
             </nav>
           </div>
         )}
