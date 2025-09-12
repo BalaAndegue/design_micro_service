@@ -299,7 +299,7 @@ const CostumWorldLanding = () => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Shop by Category</h2>
-            <a href="products" className="text-blue-600 hover:underline flex items-center">
+            <a href="/products?category=Ordinateur" className="text-blue-600 hover:underline flex items-center">
               View all <ArrowRight className="w-4 h-4 ml-1" />
             </a>
           </div>
@@ -326,7 +326,7 @@ const CostumWorldLanding = () => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Featured Products</h2>
-            <a href="/products?category=coques" className="text-blue-600 hover:underline flex items-center">
+            <a href="/products?category=Pochette" className="text-blue-600 hover:underline flex items-center">
               View all <ArrowRight className="w-4 h-4 ml-1" />
             </a>
           </div>
@@ -354,7 +354,7 @@ const CostumWorldLanding = () => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900">New Arrivals</h2>
-            <a href="products" className="text-blue-600 hover:underline flex items-center">
+            <a href="/products?category=T-shirt" className="text-blue-600 hover:underline flex items-center">
               View all <ArrowRight className="w-4 h-4 ml-1" />
             </a>
           </div>

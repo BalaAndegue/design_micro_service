@@ -36,7 +36,9 @@ export function Header() {
   const {theme , setTheme} = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
 
+ 
   const { user, logout } = useAuth();
   const { totalItems } = useCart();
 
@@ -47,8 +49,11 @@ export function Header() {
     { name: 'About', href: '/about' },
     
   ];
-  const role = getUserRole();
-
+ 
+   useEffect(() => {
+    const fetchedRole = getUserRole();
+    setRole(fetchedRole);
+  }, []);
   // Gérer le scroll pour changer le style du header
   useEffect(() => {
     function handleScroll() {
