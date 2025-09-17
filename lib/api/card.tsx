@@ -1,14 +1,7 @@
 // lib/api/cart.ts
 import { Cart, CartItem } from "../types/cart";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://customworld.onrender.com/api';
-
-export const getAuthHeaders = () => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-  return headers;
-};
+import { API_URL, getAuthHeaders } from "./config";
 
 
 

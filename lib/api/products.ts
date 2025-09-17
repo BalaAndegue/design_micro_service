@@ -1,5 +1,5 @@
 // app/lib/api.ts
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://customworld.onrender.com/api';
+import { API_URL , getAuthHeaders } from "./config";
 
 export interface Product {
   id: number;
@@ -54,12 +54,7 @@ const getUserRole = (): string | null => {
   }
 };
 
-const getAuthHeaders = () => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-  return headers;
-};
+
 
 // Fonction pour obtenir le préfixe d'API basé sur le rôle
 const getApiPrefix = (): string => {

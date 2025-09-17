@@ -1,5 +1,6 @@
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://customworld.onrender.com/api';
+import { API_URL ,getAuthHeaders} from "./config";
+
 export interface ResetPasswordRequest {
   email: string;
 }

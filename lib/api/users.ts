@@ -1,5 +1,5 @@
 // lib/api/users.ts
-
+import { API_URL,getAuthHeaders } from "./config";
 export enum UserRole {
   CUSTOMER = 'CUSTOMER',
   ADMIN = 'ADMIN',
@@ -7,7 +7,6 @@ export enum UserRole {
   // Ajoutez d'autres rôles si nécessaire
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://customworld.onrender.com/api';
 export interface User {
   id: number;
   name: string | null;
@@ -17,12 +16,7 @@ export interface User {
   role: UserRole;
   createdAt: string;
 }
-const getAuthHeaders = () => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-  return headers;
-};
+
 export const fetchUsers = async (): Promise<User[]> => {
   // Implémentation pour récupérer les utilisateurs
   const response = await fetch(`${API_URL}/admin/users`,{

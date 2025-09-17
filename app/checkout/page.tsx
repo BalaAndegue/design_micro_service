@@ -193,7 +193,7 @@ export default function CheckoutPage() {
       } catch (error) {
         console.error('Erreur vérification statut:', error);
       }
-    }, 5000); // Vérifier toutes les 5 secondes
+    }, 30000); // Vérifier toutes les 5 secondes
 
     // Arrêter après 10 minutes
     setTimeout(() => clearInterval(interval), 600000);

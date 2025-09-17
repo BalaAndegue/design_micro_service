@@ -1,12 +1,6 @@
 // lib/api/payments.ts
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://customworld.onrender.com/api';
+import { API_URL,getAuthHeaders } from "./config";
 
-const getAuthHeaders = () => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-  return headers;
-};
 
 export interface NotchPayInitiateRequest {
   amount: number;
