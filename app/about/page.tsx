@@ -13,7 +13,7 @@ import {
 import { toast } from 'sonner';
 import { Header } from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import { getAuthHeaders } from '@/lib/api/card';
+import { getAuthHeaders } from '@/lib/api/config';
 
 export default function AboutPage() {
   const [formData, setFormData] = useState({
